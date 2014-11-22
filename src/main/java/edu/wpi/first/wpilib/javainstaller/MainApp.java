@@ -1,12 +1,11 @@
 package edu.wpi.first.wpilib.javainstaller;
 
+import edu.wpi.first.wpilib.javainstaller.Controllers.MainController;
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 public class MainApp extends Application {
 
@@ -24,7 +23,7 @@ public class MainApp extends Application {
         mainStage = stage;
 
         FXMLLoader loader = new FXMLLoader();
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/main_view.fxml"));
+        Parent root = loader.load(getClass().getResource("/fxml/main_view.fxml"));
 
         Scene scene = new Scene(root, 300, 275);
 
