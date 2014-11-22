@@ -40,7 +40,7 @@ public class InternetController extends AbstractController {
         new Thread(() -> {
             try {
                 // Test for connection to the oracle site. If no connection, show an error
-                HttpURLConnection connection = (HttpURLConnection) MainApp.JRE_URL.openConnection();
+                HttpURLConnection connection = (HttpURLConnection) DownloadController.JRE_URL.openConnection();
                 if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                     // We have a connection, load the next page
                     Platform.runLater(() -> {
@@ -56,7 +56,7 @@ public class InternetController extends AbstractController {
                 } else {
                     Platform.runLater(() -> {
                         try {
-                            MainApp.showErrorPopup("Could not connect to the JRE website at: " + MainApp.JRE_URL_STRING + ", error code is " + connection.getResponseCode());
+                            MainApp.showErrorPopup("Could not connect to the JRE website at: " + DownloadController.JRE_URL_STRING + ", error code is " + connection.getResponseCode());
                         } catch (IOException e) {
                             e.printStackTrace();
                         }

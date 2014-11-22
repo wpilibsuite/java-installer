@@ -17,22 +17,6 @@ import java.net.URL;
  */
 public class MainApp extends Application {
 
-    public static final URL JRE_URL;
-    public static final String JRE_URL_STRING = "http://www.oracle.com/technetwork/java/embedded/embedded-se/downloads/javase-embedded-downloads-2209751.html";
-
-    // Jump through hoops to take care of a possible MalformedURLException when initializing the JRE url
-    static {
-        URL temp;
-        try {
-            temp = new URL(JRE_URL_STRING);
-        } catch (MalformedURLException e) {
-            temp = null;
-            e.printStackTrace();
-        }
-        JRE_URL = temp;
-
-    }
-
     public static void main(String[] args) throws Exception {
         launch(args);
     }
