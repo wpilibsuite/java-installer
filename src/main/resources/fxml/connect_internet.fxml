@@ -13,7 +13,7 @@
             <children>
                 <Button fx:id="alreadyDownloadedButton" text="Already Downloaded"/>
                 <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#handleCancel" text="Cancel"/>
-                <Button disable="true" text="&lt; Back"/>
+                <Button fx:id="backButton" text="&lt; Back" onAction="#handleBack"/>
                 <Button fx:id="nextButton" mnemonicParsing="false" onAction="#handleNext" text="Next &gt;"/>
             </children>
             <padding>

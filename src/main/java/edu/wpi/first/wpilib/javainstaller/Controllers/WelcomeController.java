@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 /**
- * Created by fred on 11/21/14.
+ * Shows the welcome screen
  */
 public class WelcomeController extends AbstractController {
 
@@ -32,9 +32,12 @@ public class WelcomeController extends AbstractController {
     @FXML
     private Button cancelButton;
 
+    public WelcomeController() {
+        super(null);
+    }
+
     @FXML
     public void initialize() {
-        initialize(mainView);
         Image frcImage = new Image(getClass().getResourceAsStream("/images/FRCicon_RGB.jpg"));
         logoImageView.setImage(frcImage);
         logoImageView.setPreserveRatio(true);

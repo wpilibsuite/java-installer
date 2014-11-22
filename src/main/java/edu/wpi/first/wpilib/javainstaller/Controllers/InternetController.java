@@ -2,6 +2,7 @@ package edu.wpi.first.wpilib.javainstaller.Controllers;
 
 import edu.wpi.first.wpilib.javainstaller.MainApp;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -26,9 +27,8 @@ public class InternetController extends AbstractController {
     @FXML
     private Button nextButton;
 
-    @FXML
-    public void initialize() {
-        initialize(mainView);
+    public InternetController() {
+        super("/fxml/intro_screen.fxml");
     }
 
     @FXML
@@ -76,5 +76,4 @@ public class InternetController extends AbstractController {
             }
         }).start();
     }
-
 }
