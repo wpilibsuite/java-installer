@@ -1,9 +1,14 @@
 package edu.wpi.first.wpilib.javainstaller.Controllers;
 
+import edu.wpi.first.wpilib.javainstaller.MainApp;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 /**
  * Created by fred on 11/21/14.
@@ -11,14 +16,30 @@ import javafx.scene.layout.Pane;
 public class WelcomeController {
 
     @FXML
-    private Pane frcImagePane;
+    private VBox mainView;
+
+    @FXML
+    private ImageView logoImageView;
+
+    @FXML
+    private Button nextButton;
+
+    @FXML
+    private Button cancelButton;
 
     @FXML
     public void initialize() {
         Image frcImage = new Image(getClass().getResourceAsStream("/images/FRCicon_RGB.jpg"));
-        ImageView frcImageView = new ImageView(frcImage);
-        frcImageView.setPreserveRatio(true);
-        frcImageView.setFitWidth(frcImagePane.getWidth() / 2);
-        frcImagePane.getChildren().add(frcImageView);
+        logoImageView.setImage(frcImage);
+        logoImageView.setPreserveRatio(true);
+    }
+
+    @FXML
+    public void handleCancel(ActionEvent event) {
+        MainApp.showExitPopup((Stage) mainView.getScene().getWindow());
+    }
+
+    public void handleNext(ActionEvent event) {
+
     }
 }
