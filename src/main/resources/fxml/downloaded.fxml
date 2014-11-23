@@ -29,7 +29,7 @@
         <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
             <children>
                 <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="700.0"
-                       text="We now need access to the roboRio to install the JRE. If you have access to the roboRio on this computer, you should hit next, and then connect to the roboRio. If you do not have access to the roboRio on this computer, then hit the Open in Explorer button, copy the file that starts with ejdk and ends with .tar.gz to a flash drive, and put it and this installer on a computer that can access the roboRio. Then, hit the Already Downloaded button in the installer on that computer and select that file."
+                       text="We will need access to the roboRio shortly to install the JRE. If you have access to the roboRio on this computer, you should hit next, and then connect to the roboRio while we finish up a few final tasks. If you do not have access to the roboRio on this computer, then hit the Open in Explorer button, copy the file that starts with ejdk and ends with .tar.gz to a flash drive, and put it and this installer on a computer that can access the roboRio. Then, hit the Already Downloaded button in the installer on that computer and select that file."
                        wrapText="true">
                     <font>
                         <Font size="24.0"/>

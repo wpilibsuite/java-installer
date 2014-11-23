@@ -43,6 +43,7 @@ public class InternetController extends AbstractController {
             try {
                 // Test for connection to the oracle site. If no connection, show an error
                 HttpURLConnection connection = (HttpURLConnection) DownloadController.JRE_URL.openConnection();
+                connection.connect();
                 if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                     // We have a connection, load the next page
                     Platform.runLater(() -> {

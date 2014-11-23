@@ -52,9 +52,16 @@ public class MainApp extends Application {
     }
 
     public static void showErrorPopup(String error) {
+        showErrorPopup(error, true);
+    }
+
+    public static void showErrorPopup(String error, boolean exit) {
         Dialogs.create()
                 .title("Error")
                 .message(error)
                 .showError();
+        if (exit) {
+            Platform.exit();
+        }
     }
 }
