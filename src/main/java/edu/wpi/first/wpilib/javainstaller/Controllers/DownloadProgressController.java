@@ -2,7 +2,10 @@ package edu.wpi.first.wpilib.javainstaller.Controllers;
 
 import edu.wpi.first.wpilib.javainstaller.MainApp;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -36,6 +39,13 @@ public class DownloadProgressController extends AbstractController {
         downloadThread = new Thread(new Downloader());
         downloadThread.setDaemon(true);
         downloadThread.start();
+    }
+
+    @FXML
+    @Override
+    public void handleBack(ActionEvent event) {
+        downloadThread.interrupt();
+        super.handleBack(event);
     }
 
     /**
@@ -82,8 +92,6 @@ public class DownloadProgressController extends AbstractController {
                     status = downloadConnection.getResponseCode();
                 }
 
-                System.out.println("Response code is " + downloadConnection.getResponseCode());
-
                 downloadStream = new BufferedInputStream(downloadConnection.getInputStream());
                 outputStream = new BufferedOutputStream(new FileOutputStream(javaFile));
 
@@ -122,10 +130,39 @@ public class DownloadProgressController extends AbstractController {
 
                 outputStream.flush();
                 outputStream.close();
-                downloadStream.close();
+
+                // Move to the new window
+                Platform.runLater(() -> {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/downloaded.fxml"));
+                    try {
+                        Parent root = loader.load();
+                        DownloadedController controller = loader.getController();
+                        controller.initialize(javaFile.getAbsolutePath());
+                        mainView.getScene().setRoot(root);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
             } catch (IOException e) {
                 Platform.runLater(() -> MainApp.showErrorPopup("Could not download the JRE:" + System.lineSeparator() + e));
                 e.printStackTrace();
+            } finally {
+                // Ensure streams are closed
+                if (downloadStream != null) {
+                    try {
+                        downloadStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (outputStream != null) {
+                    try {
+                        outputStream.flush();
+                        outputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
     }

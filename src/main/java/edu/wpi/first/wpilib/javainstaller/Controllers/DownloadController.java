@@ -9,7 +9,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import org.w3c.dom.Document;
 
 import java.io.*;
 import java.net.CookieHandler;
@@ -76,7 +75,7 @@ public class DownloadController extends AbstractController {
 
         // Set up the download extension listener
         browserEngine.locationProperty().addListener((value, oldLock, newLoc) -> {
-            Document doc = browserEngine.getDocument();
+
             if (signedIn && newLoc.endsWith("tar.gz")) {
                 Platform.runLater(() -> {
                     FXMLLoader loader = new FXMLLoader();

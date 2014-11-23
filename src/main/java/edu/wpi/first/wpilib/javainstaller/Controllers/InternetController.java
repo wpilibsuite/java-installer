@@ -9,7 +9,9 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.FileChooser;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 
@@ -75,5 +77,22 @@ public class InternetController extends AbstractController {
                 });
             }
         }).start();
+    }
+
+    @FXML
+    public void handleDownloaded(ActionEvent event) {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Oracle JRE");
+        chooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Compressed JRE", "*.tar.gz"));
+        File jre = chooser.showOpenDialog(mainView.getScene().getWindow());
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/untar.fxml"));
+        try {
+            Parent root = loader.load();
+            UntarController controller = loader.getController();
+            controller.initialize(jre.getAbsolutePath());
+            mainView.getScene().setRoot(root);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

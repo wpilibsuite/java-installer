@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
+
 <BorderPane fx:id="mainView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
             prefHeight="500" prefWidth="700" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="edu.wpi.first.wpilib.javainstaller.Controllers.InternetController">
+            fx:controller="edu.wpi.first.wpilib.javainstaller.Controllers.DownloadedController">
     <bottom>
         <HBox alignment="BOTTOM_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="10.0"
               BorderPane.alignment="CENTER">
             <children>
-                <Button fx:id="alreadyDownloadedButton" text="Already Downloaded" onAction="#handleDownloaded"/>
+                <Button fx:id="openDirectory" onAction="#handleOpenDirectory" text="Open in Explorer"/>
                 <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#handleCancel" text="Cancel"/>
-                <Button fx:id="backButton" text="&lt; Back" onAction="#handleBack"/>
+                <Button fx:id="backButton" onAction="#handleBack" text="&lt; Back"/>
                 <Button fx:id="nextButton" mnemonicParsing="false" onAction="#handleNext" text="Next &gt;"/>
             </children>
             <padding>
@@ -25,7 +29,7 @@
         <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
             <children>
                 <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="700.0"
-                       text="For this first step, we need to be connected to the internet. To proceed, click next. If you cannot get internet on this computer, you can run this installer on another computer to download the JRE, and then transfer it with a flash drive and click Already Downloaded."
+                       text="We now need access to the roboRio to install the JRE. If you have access to the roboRio on this computer, you should hit next, and then connect to the roboRio. If you do not have access to the roboRio on this computer, then hit the Open in Explorer button, copy the file that starts with ejdk and ends with .tar.gz to a flash drive, and put it and this installer on a computer that can access the roboRio. Then, hit the Already Downloaded button in the installer on that computer and select that file."
                        wrapText="true">
                     <font>
                         <Font size="24.0"/>
