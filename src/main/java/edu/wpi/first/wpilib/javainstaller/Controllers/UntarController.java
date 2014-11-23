@@ -1,9 +1,13 @@
 package edu.wpi.first.wpilib.javainstaller.Controllers;
 
+import edu.wpi.first.wpilib.javainstaller.MainApp;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 
@@ -14,19 +18,18 @@ import java.util.zip.GZIPInputStream;
  * Prompts the user to either move the JRE zip to a computer that has access to the roboRio, or tells them to move
  * to connect to the robot
  */
-public class UntarController extends AbstractController {
+public class UntarController {
 
     private static final int DEFAULT_BUFFER_SIZE = 1024;
+
+    @FXML
+    private BorderPane mainView;
 
     @FXML
     private Label fileNameLabel;
 
     private File jreFile;
     private Thread decompressThread;
-
-    public UntarController() {
-        super("/fxml/downloaded.fxml");
-    }
 
     public void initialize(String jrePath) {
         jreFile = new File(jrePath);
@@ -35,10 +38,9 @@ public class UntarController extends AbstractController {
             TarArchiveInputStream jreTar = null;
             File saveDir = jreFile.getParentFile();
             try {
-                System.out.println("Opening tar");
                 jreTar = new TarArchiveInputStream(new GZIPInputStream(new BufferedInputStream(new FileInputStream(jreFile))));
-                System.out.println("Tar opened");
                 TarArchiveEntry entry = jreTar.getNextTarEntry();
+                String firstDirectory = null;
                 while (entry != null) {
                     File destPath = new File(saveDir, entry.getName());
                     final TarArchiveEntry finalEntry = entry;
@@ -47,6 +49,10 @@ public class UntarController extends AbstractController {
                     if (entry.isDirectory()) {
                         // If the entry is a directory, then make the directories in the destination
                         destPath.mkdirs();
+                        // If this is the first directory we've made, save the string
+                        if (firstDirectory == null) {
+                            firstDirectory = entry.getName();
+                        }
                     } else {
                         // Otherwise, read in the entry and write it to the disk
                         BufferedOutputStream output = null;
@@ -71,6 +77,20 @@ public class UntarController extends AbstractController {
                     }
                     entry = jreTar.getNextTarEntry();
                 }
+                final String finalFirstDirectory = firstDirectory;
+                Platform.runLater(() -> {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/create_jre.fxml"));
+                    try {
+                        Parent root = loader.load();
+                        CreateJreController controller = loader.getController();
+                        assert finalFirstDirectory != null;
+                        controller.initialize(saveDir.getAbsolutePath() + File.separator + finalFirstDirectory.substring(0, finalFirstDirectory.indexOf("/")),
+                                jreFile.getAbsolutePath());
+                        mainView.getScene().setRoot(root);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
@@ -88,9 +108,21 @@ public class UntarController extends AbstractController {
     }
 
     @FXML
-    @Override
     public void handleBack(ActionEvent event) {
         decompressThread.interrupt();
-        super.handleBack(event);
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/downloaded.fxml"));
+        try {
+            Parent root = loader.load();
+            DownloadedController controller = loader.getController();
+            controller.initialize(jreFile.getAbsolutePath());
+            mainView.getScene().setRoot(root);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    public void handleCancel(ActionEvent event) {
+        MainApp.showExitPopup();
     }
 }
