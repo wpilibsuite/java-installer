@@ -74,6 +74,18 @@ public class CreateJreController {
                     Platform.runLater(() -> MainApp.showErrorScreen(new Exception("JRE Creation failed, exit code " + proc.exitValue())));
                 } else {
                     m_logger.debug("Successfully Created JRE!");
+                    Platform.runLater(() -> {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/connect_roborio.fxml"));
+                        try {
+                            Parent root = loader.load();
+                            ConnectRoboRioController controller = loader.getController();
+                            controller.initialize(m_untarredLocation, m_tarLocation);
+                            mainView.getScene().setRoot(root);
+                        } catch (IOException e) {
+                            m_logger.error("Could not load RoboRioConnect controller", e);
+                            MainApp.showErrorScreen(e);
+                        }
+                    });
                 }
             } catch (IOException | InterruptedException e) {
                 m_logger.error("Could not create the custom JRE!", e);
