@@ -4,10 +4,10 @@ import edu.wpi.first.wpilib.javainstaller.MainApp;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import net.mightypork.rpack.utils.DesktopApi;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
@@ -38,12 +38,7 @@ public class DownloadedController extends AbstractController {
     public void handleOpenDirectory(ActionEvent event) {
         File jreFile = new File(m_path);
         File parent = jreFile.getParentFile();
-        try {
-            Desktop.getDesktop().open(parent);
-        } catch (IOException e) {
-            m_logger.warn("Could not open an explorer to the JRE folder", e);
-            MainApp.showErrorScreen(e);
-        }
+        DesktopApi.open(parent);
     }
 
     public void handleNext(ActionEvent event) {
