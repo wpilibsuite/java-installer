@@ -1,14 +1,21 @@
 package edu.wpi.first.wpilib.javainstaller;
 
+import edu.wpi.first.wpilib.javainstaller.Controllers.ErrorController;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialogs;
+import sun.rmi.runtime.Log;
+import sun.usagetracker.UsageTrackerClient;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -17,15 +24,20 @@ import java.net.URL;
  */
 public class MainApp extends Application {
 
+    private static final Logger logger = LogManager.getLogger();
+    private static Scene _scene;
+
     public static void main(String[] args) throws Exception {
         launch(args);
     }
 
     public void start(Stage stage) throws Exception {
+        logger.trace("Starting application");
         FXMLLoader loader = new FXMLLoader();
         Parent root = loader.load(getClass().getResource("/fxml/intro_screen.fxml"));
 
         Scene scene = new Scene(root);
+        _scene = scene;
 
         stage.setTitle("FRC roboRio Java Installer");
         stage.setScene(scene);
@@ -47,6 +59,7 @@ public class MainApp extends Application {
                 .showConfirm();
 
         if (action == org.controlsfx.dialog.Dialog.ACTION_YES) {
+            logger.debug("Exiting installer from popup");
             Platform.exit();
         }
     }
@@ -61,6 +74,26 @@ public class MainApp extends Application {
                 .message(error)
                 .showError();
         if (exit) {
+            logger.debug("Exiting application from error popup");
+            Platform.exit();
+        }
+    }
+
+    public static void showErrorScreen(Exception e) {
+        FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/error.fxml"));
+        try {
+            Parent root = loader.load();
+            ErrorController controller = loader.getController();
+            controller.initialize(e);
+            _scene.setRoot(root);
+        } catch (IOException ex) {
+            LogManager.getLogger().error("Unknown error when displaying the logger", ex);
+            Dialogs.create()
+                    .title("Error Displaying Error")
+                    .message("Something is really broken. Please copy the contents of the logs folder in " +
+                            new File(".").getAbsolutePath() +
+                            " to the FIRST discussion board")
+                    .showError();
             Platform.exit();
         }
     }

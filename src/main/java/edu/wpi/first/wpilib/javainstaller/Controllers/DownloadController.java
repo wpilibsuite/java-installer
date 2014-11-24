@@ -9,6 +9,8 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.net.CookieHandler;
@@ -33,7 +35,9 @@ public class DownloadController extends AbstractController {
             temp = new URL(JRE_URL_STRING);
         } catch (MalformedURLException e) {
             temp = null;
-            e.printStackTrace();
+            LogManager.getLogger(DownloadController.class)
+                    .error("Could not parse the JRE url. Something is seriously messed up. URL was " + JRE_URL_STRING, e);
+            Platform.runLater(() -> MainApp.showErrorScreen(e));
         }
         JRE_URL = temp;
 
@@ -61,6 +65,7 @@ public class DownloadController extends AbstractController {
     private boolean creatingAccount = false;
     private boolean signedIn = false;
     private int currentInstruction = 0;
+    private final Logger m_logger = LogManager.getLogger();
 
     public DownloadController() {
         super("/fxml/connect_internet.fxml");
@@ -78,6 +83,7 @@ public class DownloadController extends AbstractController {
 
             if (signedIn && newLoc.endsWith("tar.gz")) {
                 Platform.runLater(() -> {
+                    m_logger.debug("Signed in and have the .tar.gz link.");
                     FXMLLoader loader = new FXMLLoader();
                     try {
                         Parent root = loader.load(getClass().getResource("/fxml/download_progress.fxml").openStream());
@@ -85,7 +91,8 @@ public class DownloadController extends AbstractController {
                         controller.initialize(new URL(newLoc));
                         mainView.getScene().setRoot(root);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        m_logger.error("Could not display the downloadprogress page", e);
+                        MainApp.showErrorScreen(e);
                     }
                 });
             }
@@ -95,12 +102,14 @@ public class DownloadController extends AbstractController {
         browserEngine.getLoadWorker().stateProperty().addListener((ov, oldState, newState) -> {
             String location = browserEngine.getLocation();
             if (location.equals(JRE_URL_STRING)) {
+                m_logger.debug("Loading download page page");
                 Platform.runLater(() -> {
                     currentInstruction = 0;
                     setInstructionText();
                 });
             } else if (location.contains(JRE_LOGIN_STRING)) {
                 signedIn = true;
+                m_logger.debug("Loading login page");
                 Platform.runLater(() -> {
                     if (!creatingAccount) {
                         currentInstruction = 2;
@@ -109,11 +118,13 @@ public class DownloadController extends AbstractController {
                 });
             } else if (location.contains(JRE_ACCOUNT_CREATE_PAGE)) {
                 creatingAccount = true;
+                m_logger.debug("Loading account creation page");
                 Platform.runLater(() -> {
                     currentInstruction = 3;
                     setInstructionText();
                 });
             } else {
+                m_logger.debug("Loading unknown page");
                 Platform.runLater(() -> {
                     currentInstruction = 4;
                     setInstructionText();
@@ -158,6 +169,7 @@ public class DownloadController extends AbstractController {
             default:
                 instructions.setText(instructionStrings[currentInstruction]);
                 instructions.setOnMouseClicked((mouseEvent) -> {
+                    m_logger.debug("Restarting login process");
                     browserEngine.load(JRE_URL_STRING);
                     signedIn = false;
                     creatingAccount = false;

@@ -10,6 +10,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.util.zip.GZIPInputStream;
@@ -30,6 +32,7 @@ public class UntarController {
 
     private File jreFile;
     private Thread decompressThread;
+    private final Logger m_logger = LogManager.getLogger();
 
     public void initialize(String jrePath) {
         jreFile = new File(jrePath);
@@ -37,15 +40,17 @@ public class UntarController {
             // Open the jar file
             TarArchiveInputStream jreTar = null;
             File saveDir = jreFile.getParentFile();
+            m_logger.debug("Starting decompress of file " + jrePath + " to " + saveDir.getAbsolutePath());
             try {
                 jreTar = new TarArchiveInputStream(new GZIPInputStream(new BufferedInputStream(new FileInputStream(jreFile))));
                 TarArchiveEntry entry = jreTar.getNextTarEntry();
+                // We save the first directory that we see to extract the inner folder name later.
                 String firstDirectory = null;
                 while (entry != null) {
                     File destPath = new File(saveDir, entry.getName());
                     final TarArchiveEntry finalEntry = entry;
                     Platform.runLater(() -> fileNameLabel.setText(finalEntry.getName()));
-                    System.out.println("Untarring " + entry.getName());
+                    m_logger.debug("Untarring " + entry.getName());
                     if (entry.isDirectory()) {
                         // If the entry is a directory, then make the directories in the destination
                         destPath.mkdirs();
@@ -61,12 +66,12 @@ public class UntarController {
                             int readBytes = 0;
                             output = new BufferedOutputStream(new FileOutputStream(destPath));
 
+                            // Write the tar entry to the current file
                             while ((readBytes = jreTar.read(buffer, 0, DEFAULT_BUFFER_SIZE)) != -1) {
                                 output.write(buffer, 0, readBytes);
                             }
                         } catch (IOException | IllegalArgumentException e) {
-                            System.err.println("Couldn't untar entry " + entry.getName());
-                            e.printStackTrace();
+                            m_logger.warn("Couldn't untar entry " + entry.getName(), e);
                         } finally {
                             if (output != null) {
                                 output.flush();
@@ -88,17 +93,19 @@ public class UntarController {
                                 jreFile.getAbsolutePath());
                         mainView.getScene().setRoot(root);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        m_logger.error("Could not load create jre window", e);
+                        MainApp.showErrorScreen(e);
                     }
                 });
             } catch (IOException e) {
-                e.printStackTrace();
+                m_logger.error("Exception when untarring the JRE", e);
+                Platform.runLater(() -> MainApp.showErrorScreen(e));
             } finally {
                 if (jreTar != null) {
                     try {
                         jreTar.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        m_logger.warn("Exception when closing the tar stream", e);
                     }
                 }
             }
@@ -117,7 +124,8 @@ public class UntarController {
             controller.initialize(jreFile.getAbsolutePath());
             mainView.getScene().setRoot(root);
         } catch (IOException e) {
-            e.printStackTrace();
+            m_logger.error("Could not load the downloaded view");
+            MainApp.showErrorScreen(e);
         }
     }
 

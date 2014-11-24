@@ -10,6 +10,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.controlsfx.dialog.Dialogs;
 
 import java.io.IOException;
@@ -37,6 +39,7 @@ public class ConnectRoboRioController {
     private String m_JREFolder;
     private String m_tarLocation;
     private int teamNumber = -1;
+    private final Logger m_logger = LogManager.getLogger();
 
     public void initialize(String JREFolder, String tarLocation) {
         m_JREFolder = JREFolder;
@@ -66,7 +69,8 @@ public class ConnectRoboRioController {
             controller.initialize(m_tarLocation);
             mainView.getScene().setRoot(root);
         } catch (IOException e) {
-            e.printStackTrace();
+            m_logger.error("Could not load the downloaded controller", e);
+            MainApp.showErrorScreen(e);
         }
     }
 
@@ -81,12 +85,13 @@ public class ConnectRoboRioController {
         // get to the internet, they have the ability to stop the program without waiting for a timeout
         nextButton.setDisable(true);
         nextButton.setText("Checking Connection");
-        String roborioAddress = String.format(ROBO_RIO_MDNS_FORMAT_STRING, teamNumber);
-        mainLabel.setText("Connecting to " + roborioAddress);
+        String roboRioAddress = String.format(ROBO_RIO_MDNS_FORMAT_STRING, teamNumber);
+        mainLabel.setText("Connecting to " + roboRioAddress);
+        m_logger.debug("Connecting to " + roboRioAddress);
         new Thread(() -> {
             try {
                 // Test for connection to the oracle site. If no connection, show an error
-                HttpURLConnection connection = (HttpURLConnection) new URL(roborioAddress).openConnection();
+                HttpURLConnection connection = (HttpURLConnection) new URL(roboRioAddress).openConnection();
                 connection.connect();
                 if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                     // We have a connection, load the next page
@@ -94,23 +99,28 @@ public class ConnectRoboRioController {
                         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/deploy.fxml"));
                         Parent root = null;
                         try {
+                            m_logger.debug("Connected to the roboRio at " + roboRioAddress);
                             root = loader.load();
                             mainView.getScene().setRoot(root);
                             DeployController controller = loader.getController();
-
+                            controller.initialize(m_tarLocation, m_JREFolder, teamNumber);
+                            mainView.getScene().setRoot(root);
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            m_logger.error("Could not load the deploy controller", e);
+                            MainApp.showErrorScreen(e);
                         }
                     });
                 } else {
                     Platform.runLater(() -> {
-                        MainApp.showErrorPopup("Could not connect to the roboRio at " + roborioAddress);
+                        MainApp.showErrorPopup("Could not connect to the roboRio at " + roboRioAddress);
+                        m_logger.warn("Could not connect to the roboRio at " + roboRioAddress);
                         nextButton.setDisable(false);
                         nextButton.setText("Retry Connect");
                         mainLabel.setText(CONNECTION_STRING);
                     });
                 }
-            } catch (java.io.IOException e) {
+            } catch (IOException e) {
+                m_logger.warn("Unknown error when attempting to connect to the roboRio", e);
                 Platform.runLater(() -> {
                     MainApp.showErrorPopup(
                             "Unknown error when attempting to connect to the roborio: "

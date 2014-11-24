@@ -9,6 +9,8 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.net.*;
@@ -29,6 +31,7 @@ public class DownloadProgressController extends AbstractController {
 
     private URL downloadUrl;
     private Thread downloadThread;
+    private final Logger m_logger = LogManager.getLogger();
 
     public DownloadProgressController() {
         super("/fxml/download.fxml");
@@ -79,6 +82,7 @@ public class DownloadProgressController extends AbstractController {
                 downloadConnection.connect();
 
                 // Oracle's CDN will redirect us here. Follow any redirects until we're done
+                m_logger.debug("Initial url is " + downloadConnection.getURL());
                 int status = downloadConnection.getResponseCode();
                 while (status == HttpURLConnection.HTTP_MOVED_TEMP ||
                         status == HttpURLConnection.HTTP_MOVED_PERM ||
@@ -91,6 +95,7 @@ public class DownloadProgressController extends AbstractController {
                     downloadConnection.connect();
                     status = downloadConnection.getResponseCode();
                 }
+                m_logger.debug("Final url is " + downloadConnection.getURL());
 
                 downloadStream = new BufferedInputStream(downloadConnection.getInputStream());
                 outputStream = new BufferedOutputStream(new FileOutputStream(javaFile));
@@ -104,6 +109,7 @@ public class DownloadProgressController extends AbstractController {
                 int rateDownload = 0;
                 final int fileSize = downloadConnection.getContentLength();
                 long startTime = System.currentTimeMillis();
+                m_logger.debug("Starting JRE download. File size is " + fileSize + " bytes");
                 while ((sizeOfChunk = downloadStream.read(buffer)) != -1) {
                     outputStream.write(buffer, 0, sizeOfChunk);
                     long endTime = System.currentTimeMillis();
@@ -117,8 +123,6 @@ public class DownloadProgressController extends AbstractController {
                         progressBar.setProgress(percent);
                         percentLabel.setText((int) (percent * 100) + "%");
                         if (updateRate) {
-                            System.out.println("final chunk was " + finalChunkSize);
-                            System.out.println("time taken was " + timeTaken);
                             rateLabel.setText((int) (finalChunkSize / (double) timeTaken) + " kB/s");
                         }
                     });
@@ -128,6 +132,7 @@ public class DownloadProgressController extends AbstractController {
                     }
                 }
 
+                m_logger.debug("Downloaded JRE");
                 outputStream.flush();
                 outputStream.close();
 
@@ -140,19 +145,20 @@ public class DownloadProgressController extends AbstractController {
                         controller.initialize(javaFile.getAbsolutePath());
                         mainView.getScene().setRoot(root);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        m_logger.error("Error when loaded downloaded page", e);
+                        MainApp.showErrorScreen(e);
                     }
                 });
             } catch (IOException e) {
-                Platform.runLater(() -> MainApp.showErrorPopup("Could not download the JRE:" + System.lineSeparator() + e));
-                e.printStackTrace();
+                m_logger.error("Could not download the JRE", e);
+                Platform.runLater(() -> MainApp.showErrorScreen(e));
             } finally {
                 // Ensure streams are closed
                 if (downloadStream != null) {
                     try {
                         downloadStream.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        m_logger.warn("Error when closing the download stream", e);
                     }
                 }
                 if (outputStream != null) {
@@ -160,7 +166,7 @@ public class DownloadProgressController extends AbstractController {
                         outputStream.flush();
                         outputStream.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        m_logger.warn("Error when closing the output stream", e);
                     }
                 }
             }

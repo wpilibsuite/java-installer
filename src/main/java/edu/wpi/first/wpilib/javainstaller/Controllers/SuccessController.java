@@ -1,25 +1,23 @@
 package edu.wpi.first.wpilib.javainstaller.Controllers;
 
 import edu.wpi.first.wpilib.javainstaller.MainApp;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
 /**
- * Shows the welcome screen
+ * Final controller for a successful deploy!
  */
-public class WelcomeController extends AbstractController {
+public class SuccessController {
 
     @FXML
     private BorderPane mainView;
@@ -27,29 +25,27 @@ public class WelcomeController extends AbstractController {
     @FXML
     private ImageView logoImageView;
 
-    @FXML
-    private Button nextButton;
+    private final Logger m_logger = LogManager.getLogger();
 
-    @FXML
-    private Button cancelButton;
-
-    public WelcomeController() {
-        super(null);
-    }
-
-    @FXML
-    public void initialize() {
+    private void initialize() {
         Image frcImage = new Image(getClass().getResourceAsStream("/images/FRCicon_RGB.jpg"));
         logoImageView.setImage(frcImage);
         logoImageView.setPreserveRatio(true);
     }
 
-    public void handleNext(ActionEvent event) {
+    @FXML
+    private void handleFinish(ActionEvent event) {
+        m_logger.debug("Finished!");
+        Platform.exit();
+    }
+
+    @FXML
+    private void handleRestart(ActionEvent event) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/fxml/connect_internet.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/fxml/intro_screen.fxml"));
             mainView.getScene().setRoot(root);
         } catch (IOException e) {
-            LogManager.getLogger().debug("Error when displaying connect internet screen", e);
+            m_logger.error("Error when loading intro_screen from restart");
             MainApp.showErrorScreen(e);
         }
     }

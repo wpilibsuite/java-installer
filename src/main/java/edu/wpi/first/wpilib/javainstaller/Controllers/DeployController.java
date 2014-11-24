@@ -1,5 +1,6 @@
 package edu.wpi.first.wpilib.javainstaller.Controllers;
 
+import com.sun.deploy.panel.JreFindDialog;
 import edu.wpi.first.wpilib.javainstaller.MainApp;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -10,17 +11,24 @@ import javafx.scene.layout.BorderPane;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPClientConfig;
 import org.apache.commons.net.ftp.FTPReply;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.action.Action;
 
 import javax.security.auth.login.Configuration;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
  * Deploys the JRE to the roboRio
  */
 public class DeployController {
-    private static final String JRE_INSTALL_LOCATION = "/usr/local/frc/";
+    private static final String JRE_INSTALL_LOCATION = "/usr/local/frc";
+    // The roborio uses anonymous login
+    private static final String FTP_USER_NAME = "anonymous";
+    private static final String FTP_PASSWORD = "";
 
     @FXML
     private BorderPane mainView;
@@ -30,6 +38,7 @@ public class DeployController {
     private int m_teamNumber;
 
     private Thread m_ftpThread;
+    private final Logger m_logger = LogManager.getLogger();
 
     public void initialize(String tarLocation, String jreLocation, int teamNumber) {
         m_tarLocation = tarLocation;
@@ -37,22 +46,32 @@ public class DeployController {
         m_teamNumber = teamNumber;
         m_ftpThread = new Thread(() -> {
             FTPClient roboRioClient = new FTPClient();
+            boolean success = false;
             try {
                 roboRioClient.connect(String.format(ConnectRoboRioController.ROBO_RIO_MDNS_FORMAT_STRING, m_teamNumber));
                 int reply = roboRioClient.getReplyCode();
                 if (!FTPReply.isPositiveCompletion(reply)) {
+                    m_logger.warn("FTP error connecting to the roborio, FTP code is " + reply);
                     MainApp.showErrorPopup("Error connecting to the roboRio, FTP code is " + reply, false);
                     handleBack(null);
                 }
-
-                // Loop through all JRE files and copy them to the roboRio
+                roboRioClient.login(FTP_USER_NAME, FTP_PASSWORD);
                 File jreFolder = new File(m_jreLocation);
-                
+                success = roboRioClient.storeFile(JRE_INSTALL_LOCATION, new FileInputStream(jreFolder));
             } catch (IOException e) {
-                e.printStackTrace();
+                m_logger.error("Could not connect the roboRio.", e);
+                Platform.runLater(() -> MainApp.showErrorScreen(e));
+            }
+
+            if (success) {
                 Platform.runLater(() -> {
-                    MainApp.showErrorPopup("Could not connect to the roboRio: " + System.lineSeparator() + e, false);
-                    handleBack(null);
+                    try {
+                        Parent root = FXMLLoader.load(getClass().getResource("/fxml/success.fxml"));
+                        mainView.getScene().setRoot(root);
+                    } catch (IOException e) {
+                        m_logger.error("Could not load the success screen", e);
+                        MainApp.showErrorScreen(e);
+                    }
                 });
             }
         });
@@ -69,7 +88,8 @@ public class DeployController {
             controller.initialize(m_tarLocation, m_jreLocation);
             mainView.getScene().setRoot(root);
         } catch (IOException e) {
-            e.printStackTrace();
+            m_logger.error("Could not load the connect roborio controller");
+            MainApp.showErrorScreen(e);
         }
     }
 

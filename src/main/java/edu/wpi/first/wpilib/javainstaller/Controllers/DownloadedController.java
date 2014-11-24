@@ -1,19 +1,24 @@
 package edu.wpi.first.wpilib.javainstaller.Controllers;
 
+import edu.wpi.first.wpilib.javainstaller.MainApp;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
 /**
- * Created by Fredric on 11/22/14.
+ * Alerts the user to being done the download. Also opens a window to the JRE download location if the user needs to move
+ * computer
  */
 public class DownloadedController extends AbstractController {
 
     private String m_path;
+    private final Logger m_logger = LogManager.getLogger();
 
     public DownloadedController() {
         // The previous to this would be the progress controller, but we don't have a url for it, or cookies, so
@@ -36,7 +41,8 @@ public class DownloadedController extends AbstractController {
         try {
             Desktop.getDesktop().open(parent);
         } catch (IOException e) {
-            e.printStackTrace();
+            m_logger.warn("Could not open an explorer to the JRE folder", e);
+            MainApp.showErrorScreen(e);
         }
     }
 
@@ -48,7 +54,8 @@ public class DownloadedController extends AbstractController {
             controller.initialize(m_path);
             mainView.getScene().setRoot(root);
         } catch (IOException e) {
-            e.printStackTrace();
+            m_logger.error("Could not load the untar controller", e);
+            MainApp.showErrorScreen(e);
         }
     }
 }

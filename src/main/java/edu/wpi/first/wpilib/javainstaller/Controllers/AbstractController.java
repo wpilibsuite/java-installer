@@ -7,6 +7,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
@@ -18,6 +20,7 @@ public abstract class AbstractController {
     private final String m_previousLocation;
     @FXML
     protected BorderPane mainView;
+    private final Logger m_logger = LogManager.getLogger();
 
     /**
      * @param previousLocation The screen to go to when the back button is pressed
@@ -37,7 +40,8 @@ public abstract class AbstractController {
             Parent root = FXMLLoader.load(getClass().getResource(m_previousLocation));
             mainView.getScene().setRoot(root);
         } catch (IOException e) {
-            e.printStackTrace();
+            m_logger.error("Could not load location " + m_previousLocation);
+            MainApp.showErrorScreen(e);
         }
     }
 

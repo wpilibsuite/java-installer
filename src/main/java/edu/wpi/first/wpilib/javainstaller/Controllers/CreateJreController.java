@@ -8,6 +8,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -29,13 +31,17 @@ public class CreateJreController {
     private String m_untarredLocation;
     private String m_tarLocation;
     private Thread m_JRECreateThread;
+    private final Logger m_logger = LogManager.getLogger();
 
     public void initialize(String untarredLocation, String tarLocation) {
         m_untarredLocation = untarredLocation;
         m_tarLocation = tarLocation;
         m_JRECreateThread = new Thread(() -> {
-            String jreCreateLibLocation = m_untarredLocation + File.separator + "lib" + File.separator + "JRECreate.jar";
-            String finalCommand = String.format(JRE_CREATE_COMMAND, jreCreateLibLocation);
+            final String jreCreateLibLocation = m_untarredLocation + File.separator + "lib" + File.separator + "JRECreate.jar";
+            final String finalCommand = String.format(JRE_CREATE_COMMAND, jreCreateLibLocation);
+            m_logger.debug("Staring JRE Creation");
+            m_logger.debug("Creator location: " + jreCreateLibLocation);
+            m_logger.debug("Command: " + finalCommand);
             Platform.runLater(() -> commandLabel.setText(finalCommand));
             try {
                 // Run the JRE create Process
@@ -47,25 +53,31 @@ public class CreateJreController {
                         new File(m_untarredLocation).getParentFile());
                 if (proc.waitFor() != 0) {
                     String line = "";
-
+                    StringBuilder output = new StringBuilder();
+                    m_logger.error("JRE Creation failed, starting output");
+                    m_logger.error("JRE Creation stdOut follows:");
                     // Echo the output from stdout and err
                     BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
                     while ((line = reader.readLine()) != null) {
-                        System.out.println(line);
+                        output.append(line).append(System.lineSeparator());
                     }
+                    m_logger.error(output.toString());
+                    m_logger.error("JRE Creation stdOut end");
+                    m_logger.error("JRE Creation stdErr start");
+                    output = new StringBuilder();
                     reader = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
                     while ((line = reader.readLine()) != null) {
-                        System.err.println(line);
+                        output.append(line).append(System.lineSeparator());
                     }
+                    m_logger.error(output.toString());
 
-                    Platform.runLater(() -> MainApp.showErrorPopup("Unknown error: JRE Creation failed, exit code " + proc.exitValue()));
+                    Platform.runLater(() -> MainApp.showErrorScreen(new Exception("JRE Creation failed, exit code " + proc.exitValue())));
                 } else {
-                    System.out.println("Successfully Created JRE!");
+                    m_logger.debug("Successfully Created JRE!");
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (IOException | InterruptedException e) {
+                m_logger.error("Could not create the custom JRE!", e);
+                Platform.runLater(() -> MainApp.showErrorScreen(e));
             }
         });
         m_JRECreateThread.setDaemon(true);
@@ -82,7 +94,8 @@ public class CreateJreController {
             controller.initialize(m_tarLocation);
             mainView.getScene().setRoot(root);
         } catch (IOException e) {
-            e.printStackTrace();
+            m_logger.error("Could not display downloaded page", e);
+            MainApp.showErrorScreen(e);
         }
     }
 
