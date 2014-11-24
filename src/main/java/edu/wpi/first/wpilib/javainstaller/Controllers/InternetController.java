@@ -101,15 +101,17 @@ public class InternetController extends AbstractController {
         chooser.setTitle("Oracle JRE");
         chooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Compressed JRE", "*.tar.gz"));
         File jre = chooser.showOpenDialog(mainView.getScene().getWindow());
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/untar.fxml"));
-        try {
-            Parent root = loader.load();
-            UntarController controller = loader.getController();
-            controller.initialize(jre.getAbsolutePath());
-            mainView.getScene().setRoot(root);
-        } catch (IOException e) {
-            m_logger.error("Could not load the untar screen.", e);
-            MainApp.showErrorScreen(e);
+        if (jre != null) {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/untar.fxml"));
+            try {
+                Parent root = loader.load();
+                UntarController controller = loader.getController();
+                controller.initialize(jre.getAbsolutePath());
+                mainView.getScene().setRoot(root);
+            } catch (IOException e) {
+                m_logger.error("Could not load the untar screen.", e);
+                MainApp.showErrorScreen(e);
+            }
         }
     }
 }
