@@ -1,6 +1,5 @@
 package edu.wpi.first.wpilib.javainstaller.Controllers;
 
-import com.sun.deploy.panel.JreFindDialog;
 import edu.wpi.first.wpilib.javainstaller.MainApp;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -10,16 +9,13 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPClientConfig;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.controlsfx.control.action.Action;
-import sun.applet.Main;
-import sun.security.pkcs11.wrapper.CK_SSL3_KEY_MAT_OUT;
 
-import javax.security.auth.login.Configuration;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 /**
  * Deploys the JRE to the roboRio

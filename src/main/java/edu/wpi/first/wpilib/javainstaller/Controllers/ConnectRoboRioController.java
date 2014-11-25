@@ -15,9 +15,7 @@ import org.apache.logging.log4j.Logger;
 import org.controlsfx.dialog.Dialogs;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.InetAddress;
-import java.net.URL;
 import java.net.UnknownHostException;
 
 /**
