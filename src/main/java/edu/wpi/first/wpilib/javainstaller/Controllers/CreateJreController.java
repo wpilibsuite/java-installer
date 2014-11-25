@@ -44,6 +44,13 @@ public class CreateJreController {
             m_logger.debug("Command: " + finalCommand);
             Platform.runLater(() -> commandLabel.setText(finalCommand));
             try {
+                // If the JRE folder already exists the create process will fail, so delete the folder if it exists
+                final String jreLocation = new File(m_untarredLocation).getParent() + File.separator + "JRE";
+                File jreFolder = new File(jreLocation);
+                if (jreFolder.exists()) {
+                    deleteFolder(jreFolder);
+                }
+
                 // Run the JRE create Process
                 Process proc = Runtime.getRuntime().exec(
                         String.format(JRE_CREATE_COMMAND, jreCreateLibLocation),
@@ -79,7 +86,6 @@ public class CreateJreController {
                         try {
                             Parent root = loader.load();
                             ConnectRoboRioController controller = loader.getController();
-                            String jreLocation = new File(m_untarredLocation).getParent() + File.separator + "JRE";
                             controller.initialize(jreLocation, m_tarLocation);
                             mainView.getScene().setRoot(root);
                         } catch (IOException e) {
@@ -115,5 +121,21 @@ public class CreateJreController {
     @FXML
     public void handleCancel(ActionEvent event) {
         MainApp.showExitPopup();
+    }
+
+    /**
+     * Recursively deletes a folder and all subfolders
+     *
+     * @param obj The directory to delete
+     */
+    private void deleteFolder(File obj) {
+        if (obj.isFile()) {
+            obj.delete();
+        } else {
+            for (File file : obj.listFiles()) {
+                deleteFolder(file);
+            }
+            obj.delete();
+        }
     }
 }

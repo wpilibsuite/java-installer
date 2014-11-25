@@ -100,7 +100,6 @@ public class ConnectRoboRioController {
                         try {
                             m_logger.debug("Connected to the roboRio at " + roboRioAddress);
                             root = loader.load();
-                            mainView.getScene().setRoot(root);
                             DeployController controller = loader.getController();
                             controller.initialize(m_tarLocation, m_JREFolder, teamNumber);
                             mainView.getScene().setRoot(root);
