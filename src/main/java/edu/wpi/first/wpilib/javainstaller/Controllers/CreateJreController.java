@@ -79,7 +79,8 @@ public class CreateJreController {
                         try {
                             Parent root = loader.load();
                             ConnectRoboRioController controller = loader.getController();
-                            controller.initialize(m_untarredLocation, m_tarLocation);
+                            String jreLocation = new File(m_untarredLocation).getParent() + File.separator + "JRE";
+                            controller.initialize(jreLocation, m_tarLocation);
                             mainView.getScene().setRoot(root);
                         } catch (IOException e) {
                             m_logger.error("Could not load RoboRioConnect controller", e);

@@ -16,7 +16,9 @@ import org.controlsfx.dialog.Dialogs;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
 
 /**
  * Attempts to connect to the roboRio, and displays an error for the user if it cannot
@@ -90,10 +92,9 @@ public class ConnectRoboRioController {
         m_logger.debug("Connecting to " + roboRioAddress);
         new Thread(() -> {
             try {
-                // Test for connection to the oracle site. If no connection, show an error
-                HttpURLConnection connection = (HttpURLConnection) new URL(roboRioAddress).openConnection();
-                connection.connect();
-                if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                // Test for connection to the roborio. If no connection, show an error
+                InetAddress roboRio = InetAddress.getByName(roboRioAddress);
+                if (roboRio.isReachable(5000)) {
                     // We have a connection, load the next page
                     Platform.runLater(() -> {
                         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/deploy.fxml"));
@@ -112,13 +113,24 @@ public class ConnectRoboRioController {
                     });
                 } else {
                     Platform.runLater(() -> {
-                        MainApp.showErrorPopup("Could not connect to the roboRio at " + roboRioAddress);
-                        m_logger.warn("Could not connect to the roboRio at " + roboRioAddress);
+                        MainApp.showErrorPopup("Could not connect to the roboRio at " + roboRioAddress + " after 5 seconds");
+                        m_logger.warn("Could not connect to the roboRio at " + roboRioAddress + " after 5 seconds");
                         nextButton.setDisable(false);
                         nextButton.setText("Retry Connect");
                         mainLabel.setText(CONNECTION_STRING);
                     });
                 }
+            } catch (UnknownHostException e) {
+                m_logger.warn("Could not resolve the roboRio");
+                Platform.runLater(() -> {
+                    Dialogs.create()
+                            .title("Connection Error")
+                            .message("Could not find the roboRio at " + roboRioAddress + ". Are you on the same network as it?")
+                            .showError();
+                    nextButton.setDisable(false);
+                    nextButton.setText("Retry Connect");
+                    mainLabel.setText(CONNECTION_STRING);
+                });
             } catch (IOException e) {
                 m_logger.warn("Unknown error when attempting to connect to the roboRio", e);
                 Platform.runLater(() -> {
