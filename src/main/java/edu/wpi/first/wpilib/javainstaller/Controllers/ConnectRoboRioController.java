@@ -36,14 +36,16 @@ public class ConnectRoboRioController {
     @FXML
     private Label mainLabel;
 
-    private String m_JREFolder;
+    private String m_jreFolder;
     private String m_tarLocation;
+    private String m_untarredLocation;
     private int teamNumber = -1;
     private final Logger m_logger = LogManager.getLogger();
 
-    public void initialize(String JREFolder, String tarLocation) {
-        m_JREFolder = JREFolder;
+    public void initialize(String jreFolder, String tarLocation, String untarredLocation) {
+        m_jreFolder = jreFolder;
         m_tarLocation = tarLocation;
+        m_untarredLocation = untarredLocation;
 
         // Ensure only numbers are added to the team box
         teamNumberBox.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -101,7 +103,7 @@ public class ConnectRoboRioController {
                             m_logger.debug("Connected to the roboRio at " + roboRioAddress);
                             root = loader.load();
                             DeployController controller = loader.getController();
-                            controller.initialize(m_tarLocation, m_JREFolder, teamNumber);
+                            controller.initialize(m_tarLocation, m_untarredLocation, m_jreFolder, teamNumber);
                             mainView.getScene().setRoot(root);
                         } catch (IOException e) {
                             m_logger.error("Could not load the deploy controller", e);

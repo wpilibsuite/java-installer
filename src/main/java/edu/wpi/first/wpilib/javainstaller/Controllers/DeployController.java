@@ -24,7 +24,7 @@ import java.util.zip.GZIPOutputStream;
 public class DeployController {
     private static final String JRE_INSTALL_LOCATION = "/usr/local/frc";
     // File to save compress the jre to
-    private static final String JRE_TGZ_NAME = "JRE.tar.gz";
+    public static final String JRE_TGZ_NAME = "JRE.tar.gz";
     private static final String EXTRACT_DIR = "/home/admin/";
     private static final String JRE_TGZ_LOCATION = EXTRACT_DIR + JRE_TGZ_NAME;
     private static final String JRE_EXTRACT_DIR = EXTRACT_DIR + "JRE";
@@ -41,15 +41,36 @@ public class DeployController {
     private Label commandLabel;
 
     private String m_tarLocation;
+    private String m_untarredLocation;
     private String m_jreLocation;
     private JSch m_jSch = new JSch();
 
     private final Logger m_logger = LogManager.getLogger();
 
-    public void initialize(String tarLocation, String jreLocation, int teamNumber) {
+    @FXML
+    private void handleBack(ActionEvent event) {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/connect_roborio.fxml"));
+        try {
+            Parent root = loader.load();
+            ConnectRoboRioController controller = loader.getController();
+            controller.initialize(m_jreLocation, m_tarLocation, m_untarredLocation);
+            mainView.getScene().setRoot(root);
+        } catch (IOException e) {
+            m_logger.error("Could not load the connect roboRio controller");
+            MainApp.showErrorScreen(e);
+        }
+    }
+
+    @FXML
+    private void handleCancel(ActionEvent event) {
+        MainApp.showExitPopup();
+    }
+
+    public void initialize(String tarLocation, String untarredLocation, String jreLocation, int teamNumber) {
         m_tarLocation = tarLocation;
+        m_untarredLocation = untarredLocation;
         m_jreLocation = jreLocation;
-        Thread ftpThread = new Thread(() -> {
+        Thread sshThread = new Thread(() -> {
             // Turn the jre into a tar gz for ease of transfer
             Platform.runLater(() -> commandLabel.setText("Tarring created JRE"));
             File tgzFile = new File(JRE_TGZ_NAME);
@@ -62,11 +83,14 @@ public class DeployController {
                 roboRioSession.setPassword("");
                 roboRioSession.connect();
                 scpFile(tgzFile, roboRioSession);
-                extractJRE(roboRioSession);
+                setupJRE(roboRioSession);
 
                 Platform.runLater(() -> {
                     try {
-                        Parent root = FXMLLoader.load(getClass().getResource("/fxml/success.fxml"));
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/success.fxml"));
+                        Parent root = loader.load();
+                        SuccessController controller = loader.getController();
+                        controller.initialize(m_jreLocation, m_tarLocation, m_untarredLocation);
                         mainView.getScene().setRoot(root);
                     } catch (IOException e) {
                         m_logger.error("Could not load the success screen", e);
@@ -74,15 +98,19 @@ public class DeployController {
                     }
                 });
             } catch (JSchException | IOException e) {
-                m_logger.error("Could not connect to the roboRio", e);
-                Platform.runLater(() -> MainApp.showErrorPopup("Could not connect to the roboRio.", false));
-                Platform.runLater(() -> handleBack(null));
+                m_logger.error("Failure to send JRE to the roboRio", e);
+                MainApp.showErrorScreen(e);
             }
         });
-        ftpThread.setDaemon(true);
-        ftpThread.start();
+        sshThread.setDaemon(true);
+        sshThread.start();
     }
 
+    /**
+     * Creates the tar file with the created JRE for sending to the roborio
+     *
+     * @param tgzFile The tar file location to use
+     */
     private void createTar(File tgzFile) {
         if (tgzFile.exists()) {
             tgzFile.delete();
@@ -101,6 +129,14 @@ public class DeployController {
         }
     }
 
+    /**
+     * Scps a file to the given roboRio session.
+     *
+     * @param tgzFile        The tar file to scp
+     * @param roboRioSession The roboRio to scp to
+     * @throws JSchException If a ssh error occurs
+     * @throws IOException   If an IO error occurs
+     */
     private void scpFile(File tgzFile, Session roboRioSession) throws JSchException, IOException {
         Platform.runLater(() -> commandLabel.setText("Copying " + tgzFile.getAbsolutePath() + " to the roboRio"));
 
@@ -143,7 +179,15 @@ public class DeployController {
         scpChannel.disconnect();
     }
 
-    private void extractJRE(Session roboRioSession) throws JSchException, IOException {
+    /**
+     * Sets up the newly scped JRE on the roboRio. It removes any existing JRE, untars the new JRE, moves it to the correct
+     * location, sets permissions on the bin folder, and removes the temporary tar file
+     *
+     * @param roboRioSession The roborio to set up
+     * @throws JSchException If a ssh error occurs
+     * @throws IOException   If an IO error occurs
+     */
+    private void setupJRE(Session roboRioSession) throws JSchException, IOException {
         // Remove the old JRE, if it exists. If it doesn't, this will fail, and we don't care if this one fails, so just log it
         try {
             m_logger.debug("Attempting to remove old JRE");
@@ -179,25 +223,18 @@ public class DeployController {
         m_logger.debug("Cleaned up");
     }
 
-    @FXML
-    private void handleBack(ActionEvent event) {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/connect_roborio.fxml"));
-        try {
-            Parent root = loader.load();
-            ConnectRoboRioController controller = loader.getController();
-            controller.initialize(m_tarLocation, m_jreLocation);
-            mainView.getScene().setRoot(root);
-        } catch (IOException e) {
-            m_logger.error("Could not load the connect roboRio controller");
-            MainApp.showErrorScreen(e);
-        }
-    }
 
-    @FXML
-    private void handleCancel(ActionEvent event) {
-        MainApp.showExitPopup();
-    }
 
+
+    /**
+     * Recursively adds a directory to a .tar.gz. Adapted from
+     * http://stackoverflow.com/questions/13461393/compress-directory-to-tar-gz-with-commons-compress
+     *
+     * @param tOut The .tar.gz to add the directory to
+     * @param path The location of the folders and files to add
+     * @param base The base path of entry in the .tar.gz
+     * @throws IOException Any exceptions thrown during tar creation
+     */
     private void addFileToTarGz(TarArchiveOutputStream tOut, String path, String base) throws IOException {
         File f = new File(path);
         String entryName = base + f.getName();
@@ -221,32 +258,42 @@ public class DeployController {
         }
     }
 
+    /**
+     * Convenience method to execute a command on the given remote session, using the given string as part of the error
+     * if it fails to run.
+     *
+     * @param roboRioSession The ssh session of the roboRio
+     * @param command        The command to execute
+     * @param errorString    The error string to put in the exception if an error occurs. The return code will be appended to the end
+     * @throws JSchException If an ssh error occurs
+     * @throws IOException   Thrown if there is an io error, or if the command fails to run
+     */
     private void executeCommand(Session roboRioSession, String command, String errorString) throws JSchException, IOException {
         // Extract the JRE
         m_logger.debug("Running command " + command);
-        ChannelExec extractChannel = (ChannelExec) roboRioSession.openChannel(EXEC_COMMAND);
-        extractChannel.setCommand(command);
-        extractChannel.connect();
+        ChannelExec channel = (ChannelExec) roboRioSession.openChannel(EXEC_COMMAND);
+        channel.setCommand(command);
+        channel.connect();
         int sleepCount = 0;
         // Sleep for up to 10 seconds while we wait for the command to execute, checking every 100 milliseconds
         do {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
-                m_logger.warn("Interrupted exception while waiting", e);
+                m_logger.warn("Interrupted exception while waiting for command " + command + " to finish", e);
             }
-        } while (!extractChannel.isClosed() && sleepCount++ < 100);
+        } while (!channel.isClosed() && sleepCount++ < 100);
 
-        int res = extractChannel.getExitStatus();
+        int res = channel.getExitStatus();
         if (res != SUCCESS) {
             m_logger.debug("Error with command " + command);
             throw new IOException(errorString + " " + res);
         }
-        extractChannel.disconnect();
+        channel.disconnect();
     }
 
     /**
-     * Checks the return code of an ssh command. Taken from http://www.jcraft.com/jsch/examples/ScpTo.java.html.
+     * Checks the return code of an ssh command. Adapted from http://www.jcraft.com/jsch/examples/ScpTo.java.html.
      *
      * @param in The input stream of the channel
      * @return The return code
@@ -261,15 +308,17 @@ public class DeployController {
         m_logger.debug("Return code is " + b);
         if (b == 0) return b;
         if (b == -1) return b;
-        StringBuilder sb = new StringBuilder();
-        int c;
-        do {
-            c = in.read();
-            sb.append((char) c);
+        if (b == 1 || b == 2) {
+            StringBuilder sb = new StringBuilder();
+            int c;
+            do {
+                c = in.read();
+                sb.append((char) c);
+            }
+            while (c != '\n');
+            m_logger.error("Acknowledge error:");
+            m_logger.error(sb.toString());
         }
-        while (c != '\n');
-        m_logger.error("Acknowledge error:");
-        m_logger.error(sb.toString());
         return b;
     }
 }
