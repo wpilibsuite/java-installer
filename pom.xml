@@ -18,9 +18,9 @@
             <version>1.9</version>
         </dependency>
         <dependency>
-            <groupId>commons-net</groupId>
-            <artifactId>commons-net</artifactId>
-            <version>3.3</version>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <version>0.1.51</version>
         </dependency>
         <!-- TODO: After JDK8v40 goes official, this will be incorporated into java proper. Switch to the official api when available -->
         <dependency>
