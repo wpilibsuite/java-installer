@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.paint.Color;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.apache.logging.log4j.LogManager;
@@ -151,23 +152,33 @@ public class DownloadController extends AbstractController {
         switch (currentInstruction) {
             case 0:
                 instructions.setText(instructionStrings[currentInstruction]);
+                instructions.setUnderline(false);
+                instructions.setTextFill(Color.BLACK);
                 instructions.setOnMouseClicked(null);
                 break;
             case 1:
                 instructions.setText(instructionStrings[currentInstruction]);
+                instructions.setUnderline(false);
+                instructions.setTextFill(Color.BLACK);
                 instructions.setOnMouseClicked(null);
                 break;
             case 2:
                 instructions.setText(instructionStrings[currentInstruction]);
+                instructions.setUnderline(false);
+                instructions.setTextFill(Color.BLACK);
                 instructions.setOnMouseClicked(null);
                 break;
             case 3:
                 instructions.setText(instructionStrings[currentInstruction]);
+                instructions.setUnderline(false);
+                instructions.setTextFill(Color.BLACK);
                 instructions.setOnMouseClicked(null);
                 break;
             case 4:
             default:
                 instructions.setText(instructionStrings[currentInstruction]);
+                instructions.setUnderline(true);
+                instructions.setTextFill(Color.BLUE);
                 instructions.setOnMouseClicked((mouseEvent) -> {
                     m_logger.debug("Restarting login process");
                     browserEngine.load(JRE_URL_STRING);
