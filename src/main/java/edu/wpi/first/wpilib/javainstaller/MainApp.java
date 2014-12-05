@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.action.Action;
+import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialogs;
 
 import java.io.File;
@@ -52,9 +53,10 @@ public class MainApp extends Application {
         Action action = Dialogs.create()
                 .title("Exit")
                 .message("Are you sure you want to quit? The roboRio will not be set up for Java until the installer has completed.")
+                .actions(Dialog.ACTION_YES, Dialog.ACTION_NO)
                 .showConfirm();
 
-        if (action == org.controlsfx.dialog.Dialog.ACTION_YES) {
+        if (action == Dialog.ACTION_YES) {
             logger.debug("Exiting installer from popup");
             Platform.exit();
         }
