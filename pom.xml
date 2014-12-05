@@ -39,18 +39,13 @@
             <version>2.1</version>
         </dependency>
     </dependencies>
-    <profiles>
-        <profile>
-            <id>deploy-settings</id>
-            <distributionManagement>
-                <repository>
-                    <id>filesystem.repo</id>
-                    <name>Temporary Staging Repository</name>
-                    <url>file://${user.home}/releases/maven</url>
-                </repository>
-            </distributionManagement>
-        </profile>
-    </profiles>
+    <distributionManagement>
+        <repository>
+            <id>filesystem.repo</id>
+            <name>Temporary Staging Repository</name>
+            <url>file://${user.home}/releases/maven</url>
+        </repository>
+    </distributionManagement>
     <build>
         <finalName>java-installer</finalName>
         <plugins>
