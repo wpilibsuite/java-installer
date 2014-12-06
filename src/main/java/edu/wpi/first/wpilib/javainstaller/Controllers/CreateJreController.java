@@ -15,13 +15,22 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 
 /**
  * Takes the extracted JRE and turns it into a customized JRE for the roboRio
  */
 public class CreateJreController {
 
-    private static final String JRE_CREATE_COMMAND = "java -jar %s --dest JRE --profile compact2 --vm client --keep-debug-info --debug";
+    private static String[] JRE_CREATE_COMMAND = { "java",
+						   "-jar",
+						   "",
+						   "--dest", "JRE",
+						   "--profile", "compact2",
+						   "--vm", "client",
+						   "--keep-debug-info",
+						   "--debug"
+    };
 
     @FXML
     private BorderPane mainView;
@@ -38,11 +47,11 @@ public class CreateJreController {
         m_tarLocation = tarLocation;
         m_JRECreateThread = new Thread(() -> {
             final String jreCreateLibLocation = m_untarredLocation + File.separator + "lib" + File.separator + "JRECreate.jar";
-            final String finalCommand = String.format(JRE_CREATE_COMMAND, jreCreateLibLocation);
+	    JRE_CREATE_COMMAND[2] = jreCreateLibLocation;
             m_logger.debug("Staring JRE Creation");
             m_logger.debug("Creator location: " + jreCreateLibLocation);
-            m_logger.debug("Command: " + finalCommand);
-            Platform.runLater(() -> commandLabel.setText(finalCommand));
+            m_logger.debug("Command: " + Arrays.toString(JRE_CREATE_COMMAND));
+            Platform.runLater(() -> commandLabel.setText(Arrays.toString(JRE_CREATE_COMMAND)));
             try {
                 // If the JRE folder already exists the create process will fail, so delete the folder if it exists
                 final String jreLocation = new File(m_untarredLocation).getParent() + File.separator + "JRE";
@@ -50,10 +59,10 @@ public class CreateJreController {
                 if (jreFolder.exists()) {
                     deleteFolder(jreFolder);
                 }
-
+		
                 // Run the JRE create Process
                 Process proc = Runtime.getRuntime().exec(
-                        String.format(JRE_CREATE_COMMAND, jreCreateLibLocation),
+                        JRE_CREATE_COMMAND,
                         new String[]{
                                 "EJDK_HOME=" + m_untarredLocation
                         },
