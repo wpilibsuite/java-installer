@@ -2,8 +2,11 @@ package edu.wpi.first.wpilib.javainstaller.Controllers;
 
 import edu.wpi.first.wpilib.javainstaller.MainApp;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import net.mightypork.rpack.utils.DesktopApi;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,6 +20,12 @@ import java.io.IOException;
  */
 public class DownloadedController extends AbstractController {
 
+    @FXML
+    private Label textView;
+
+    @FXML
+    private Button nextButton;
+
     private String m_path;
     private final Logger m_logger = LogManager.getLogger();
 
@@ -27,6 +36,10 @@ public class DownloadedController extends AbstractController {
     }
 
     public void initialize(String path) {
+        if (!MainApp.checkJre(new File(path))) {
+            textView.setText("An unknown error occurred when downloading the JRE, and the JRE is corrupt. To Redownload the JRE, hit back, and sign in again.");
+            nextButton.setDisable(true);
+        }
         m_path = path;
     }
 

@@ -31,8 +31,6 @@ public class InternetController extends AbstractController {
 
     // Default name for the downloaded JRE.
     private static final String JRE_DEFAULT_NAME = "ejdk-8u6-fcs-b23-linux-arm-vfp-sflt-12_jun_2014.tar.gz";
-    // The md5 hash of a fully downloaded jre
-    private static final String JRE_HASH = "082F08397B0D3F63844AB472B5111C8C";
 
     @FXML
     private BorderPane mainView;
@@ -59,7 +57,7 @@ public class InternetController extends AbstractController {
         // Attempt to detect the JRE
         final File jre = new File(JRE_DEFAULT_NAME);
         // If the JRE is already downloaded and fully downloaded
-        if (jre.exists() && checkJRE(jre)) {
+        if (jre.exists() && MainApp.checkJre(jre)) {
             jreDetected = true;
             alreadyDownloadedButton.setText("Redownload JRE");
             textView.setText("The JRE was found already downloaded. If you want to proceed with the found JRE (recommended), click Next. If you would like to redownload the JRE, click Redownload JRE");
@@ -146,39 +144,6 @@ public class InternetController extends AbstractController {
         } catch (IOException e) {
             m_logger.error("Could not load the untar screen.", e);
             MainApp.showErrorScreen(e);
-        }
-    }
-
-    /**
-     * Computes the md5 of a found JRE to ensure that it is correctly downloaded
-     *
-     * @param jre The jre to check
-     * @return True if it passes the MD5 check
-     */
-    private boolean checkJRE(File jre) {
-        m_logger.debug("Found JRE, checking hash");
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            try (InputStream is = Files.newInputStream(Paths.get(jre.getAbsolutePath()))) {
-                DigestInputStream ds = new DigestInputStream(is, md);
-                byte[] input = new byte[1024];
-
-                // Read the stream to the end to get the md5
-                while (ds.read(input) != -1) {
-                }
-
-                byte[] hash = md.digest();
-                StringBuilder sb = new StringBuilder();
-                for (byte b : hash) {
-                    sb.append(String.format("%02X", b));
-                }
-                String hashString = sb.toString();
-                m_logger.debug("Computed hash is " + hashString + ", official hash is " + JRE_HASH);
-                return hashString.equalsIgnoreCase(JRE_HASH);
-            }
-        } catch (NoSuchAlgorithmException | IOException e) {
-            m_logger.warn("Could not create md5 hash", e);
-            return false;
         }
     }
 }

@@ -15,12 +15,20 @@ import org.controlsfx.dialog.Dialogs;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Main application launch point.
  */
 public class MainApp extends Application {
 
+    // The md5 hash of a fully downloaded jre
+    private static final String JRE_HASH = "082F08397B0D3F63844AB472B5111C8C";
     private static final Logger logger = LogManager.getLogger();
     private static Scene _scene;
 
@@ -93,6 +101,40 @@ public class MainApp extends Application {
                             " to the FIRST discussion board")
                     .showError();
             Platform.exit();
+        }
+    }
+
+    /**
+     * Computes the md5 of a found JRE to ensure that it is correctly downloaded
+     *
+     * @param jre The jre to check
+     * @return True if it passes the MD5 check
+     */
+    public static boolean checkJre(File jre) {
+        logger.debug("Found JRE, checking hash");
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            try (InputStream is = Files.newInputStream(Paths.get(jre.getAbsolutePath()))) {
+                DigestInputStream ds = new DigestInputStream(is, md);
+                byte[] input = new byte[1024];
+
+                // Read the stream to the end to get the md5
+                while (ds.read(input) != -1) {
+                }
+
+                byte[] hash = md.digest();
+                StringBuilder sb = new StringBuilder();
+                for (byte b : hash) {
+                    sb.append(String.format("%02X", b));
+                }
+                String hashString = sb.toString();
+                logger.debug("Computed hash is " + hashString + ", official hash is " + JRE_HASH);
+                return hashString.equalsIgnoreCase(JRE_HASH);
+            }
+        } catch (NoSuchAlgorithmException | IOException e) {
+            logger.warn("Could not create md5 hash", e);
+            return false;
+
         }
     }
 }
