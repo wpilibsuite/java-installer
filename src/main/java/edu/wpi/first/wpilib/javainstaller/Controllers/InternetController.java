@@ -12,17 +12,12 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.controlsfx.dialog.Dialogs;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Handles ensuring that the internet is up and running on the system before proceeding
@@ -130,7 +125,18 @@ public class InternetController extends AbstractController {
         chooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Compressed JRE", "*.tar.gz"));
         File jre = chooser.showOpenDialog(mainView.getScene().getWindow());
         if (jre != null) {
-            sendToUntar(jre);
+            new Thread(() -> {
+                if (MainApp.checkJre(jre)) {
+                    Platform.runLater(() -> sendToUntar(jre));
+                } else {
+                    Platform.runLater(() ->
+                                    Dialogs.create()
+                                            .title("Invalid JRE")
+                                            .message("This JRE does not pass file verification. Please choose another or redownload the JRE")
+                                            .showError()
+                    );
+                }
+            }).start();
         }
     }
 
