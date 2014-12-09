@@ -6,6 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.CheckBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -25,6 +26,9 @@ public class SuccessController {
 
     @FXML
     private ImageView logoImageView;
+
+    @FXML
+    private CheckBox cleanupCheckBox;
 
     private String m_jreFolder;
     private String m_tarLocation;
@@ -48,7 +52,9 @@ public class SuccessController {
     @FXML
     private void handleFinish(ActionEvent event) {
         // Cleanup the installer debris
-        cleanupLocalFiles();
+        if (cleanupCheckBox.isSelected()) {
+            cleanupLocalFiles();
+        }
         m_logger.debug("Finished!");
         Platform.exit();
     }

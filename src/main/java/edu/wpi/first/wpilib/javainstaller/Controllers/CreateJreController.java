@@ -22,14 +22,14 @@ import java.util.Arrays;
  */
 public class CreateJreController {
 
-    private static String[] JRE_CREATE_COMMAND = { "java",
-						   "-jar",
-						   "",
-						   "--dest", "JRE",
-						   "--profile", "compact2",
-						   "--vm", "client",
-						   "--keep-debug-info",
-						   "--debug"
+    private static String[] JRE_CREATE_COMMAND = {"java",
+            "-jar",
+            "",
+            "--dest", "JRE",
+            "--profile", "compact2",
+            "--vm", "client",
+            "--keep-debug-info",
+            "--debug"
     };
 
     @FXML
@@ -47,7 +47,7 @@ public class CreateJreController {
         m_tarLocation = tarLocation;
         m_JRECreateThread = new Thread(() -> {
             final String jreCreateLibLocation = m_untarredLocation + File.separator + "lib" + File.separator + "JRECreate.jar";
-	    JRE_CREATE_COMMAND[2] = jreCreateLibLocation;
+            JRE_CREATE_COMMAND[2] = jreCreateLibLocation;
             m_logger.debug("Staring JRE Creation");
             m_logger.debug("Creator location: " + jreCreateLibLocation);
             m_logger.debug("Command: " + Arrays.toString(JRE_CREATE_COMMAND));
@@ -59,7 +59,7 @@ public class CreateJreController {
                 if (jreFolder.exists()) {
                     deleteFolder(jreFolder);
                 }
-		
+
                 // Run the JRE create Process
                 Process proc = Runtime.getRuntime().exec(
                         JRE_CREATE_COMMAND,

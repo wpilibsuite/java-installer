@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
@@ -40,6 +41,8 @@
                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                     </VBox.margin>
                 </Label>
+                <CheckBox fx:id="cleanupCheckBox" mnemonicParsing="false" selected="true"
+                          text="Clean up local installation files?"/>
             </children>
         </VBox>
     </center>
