@@ -56,6 +56,7 @@ public class MainApp extends Application {
     /**
      * Shows a popup that exits the program on clicking yes.
      */
+    @SuppressWarnings("deprecation")
     public static void showExitPopup() {
         // TODO: When JDK8u40 is release (estimated March 2015) update this to official APIs
         Action action = Dialogs.create()
@@ -74,6 +75,7 @@ public class MainApp extends Application {
         showErrorPopup(error, true);
     }
 
+    @SuppressWarnings("deprecation")
     public static void showErrorPopup(String error, boolean exit) {
         Dialogs.create()
                 .title("Error")
@@ -85,6 +87,7 @@ public class MainApp extends Application {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public static void showErrorScreen(Exception e) {
         FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/error.fxml"));
         try {

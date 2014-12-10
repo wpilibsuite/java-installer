@@ -43,6 +43,7 @@ public class DeployController {
     private String m_tarLocation;
     private String m_untarredLocation;
     private String m_jreLocation;
+    private String m_ipAddress;
     private JSch m_jSch = new JSch();
 
     private final Logger m_logger = LogManager.getLogger();
@@ -66,10 +67,11 @@ public class DeployController {
         MainApp.showExitPopup();
     }
 
-    public void initialize(String tarLocation, String untarredLocation, String jreLocation, int teamNumber) {
+    public void initialize(String tarLocation, String untarredLocation, String jreLocation, int teamNumber, String ipAddress) {
         m_tarLocation = tarLocation;
         m_untarredLocation = untarredLocation;
         m_jreLocation = jreLocation;
+        m_ipAddress = ipAddress;
         Thread sshThread = new Thread(() -> {
             // Turn the jre into a tar gz for ease of transfer
             Platform.runLater(() -> commandLabel.setText("Tarring created JRE"));
@@ -77,9 +79,8 @@ public class DeployController {
             createTar(tgzFile);
 
             JSch.setConfig("StrictHostKeyChecking", "no");
-            String roboRioHost = String.format(ConnectRoboRioController.ROBO_RIO_MDNS_FORMAT_STRING, teamNumber);
             try {
-                Session roboRioSession = m_jSch.getSession(USER_NAME, roboRioHost);
+                Session roboRioSession = m_jSch.getSession(USER_NAME, ipAddress);
                 roboRioSession.setPassword("");
                 roboRioSession.connect();
                 scpFile(tgzFile, roboRioSession);

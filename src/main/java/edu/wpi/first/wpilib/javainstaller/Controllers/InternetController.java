@@ -22,6 +22,7 @@ import java.net.SocketTimeoutException;
 /**
  * Handles ensuring that the internet is up and running on the system before proceeding
  */
+@SuppressWarnings("deprecation")
 public class InternetController extends AbstractController {
 
     // Default name for the downloaded JRE.
@@ -77,10 +78,9 @@ public class InternetController extends AbstractController {
                     m_logger.debug("Internet check successful, moving to download");
                     // We have a connection, load the next page
                     Platform.runLater(() -> {
-                        FXMLLoader loader = new FXMLLoader();
                         Parent root = null;
                         try {
-                            root = loader.load(getClass().getResource("/fxml/download.fxml"));
+                            root = FXMLLoader.load(getClass().getResource("/fxml/download.fxml"));
                         } catch (IOException e) {
                             m_logger.error("Error when attempting to load the download window.", e);
                             MainApp.showErrorScreen(e);
@@ -119,6 +119,7 @@ public class InternetController extends AbstractController {
     }
 
     @FXML
+    @SuppressWarnings("deprecation")
     public void handleDownloaded(ActionEvent event) {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Oracle JRE");

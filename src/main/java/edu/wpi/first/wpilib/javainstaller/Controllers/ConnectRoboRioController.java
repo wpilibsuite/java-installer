@@ -16,7 +16,6 @@ import org.controlsfx.dialog.Dialogs;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 /**
  * Attempts to connect to the roboRio, and displays an error for the user if it cannot
@@ -24,6 +23,8 @@ import java.net.UnknownHostException;
 public class ConnectRoboRioController {
 
     public static final String ROBO_RIO_MDNS_FORMAT_STRING = "roborio-%d.local";
+    public static final String ROBO_RIO_USB_IP = "172.22.11.2";
+    public static final String ROBO_RIO_IP_FORMAT_STRING = "10.%d.%d.2";
     private static final String CONNECTION_STRING = "Please ensure that you are connected to the roboRio on this computer, and " +
             "input your team number below. Once you have put in your team number, hit connect.";
 
@@ -76,9 +77,11 @@ public class ConnectRoboRioController {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public void handleNext(ActionEvent event) {
         // First, check to make sure a number has been entered
         if (teamNumber == -1) {
+            // TODO: When JDK 8u40 is released, replace this with the official api and remove the suppress warning
             Dialogs.create().title("Team Number").message("Please type your team number!").showError();
             return;
         }
@@ -87,62 +90,73 @@ public class ConnectRoboRioController {
         // get to the internet, they have the ability to stop the program without waiting for a timeout
         nextButton.setDisable(true);
         nextButton.setText("Checking Connection");
-        String roboRioAddress = String.format(ROBO_RIO_MDNS_FORMAT_STRING, teamNumber);
-        mainLabel.setText("Connecting to " + roboRioAddress);
-        m_logger.debug("Connecting to " + roboRioAddress);
+        String roboRioMDNS = String.format(ROBO_RIO_MDNS_FORMAT_STRING, teamNumber);
+        String roboRioIP = String.format(ROBO_RIO_IP_FORMAT_STRING, teamNumber / 100, teamNumber % 100);
+        mainLabel.setText("Connecting to " + roboRioMDNS);
+        m_logger.debug("Connecting to " + roboRioMDNS);
         new Thread(() -> {
-            try {
-                // Test for connection to the roborio. If no connection, show an error
-                InetAddress roboRio = InetAddress.getByName(roboRioAddress);
-                if (roboRio.isReachable(5000)) {
-                    // We have a connection, load the next page
-                    Platform.runLater(() -> {
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/deploy.fxml"));
-                        Parent root = null;
-                        try {
-                            m_logger.debug("Connected to the roboRio at " + roboRioAddress);
-                            root = loader.load();
-                            DeployController controller = loader.getController();
-                            controller.initialize(m_tarLocation, m_untarredLocation, m_jreFolder, teamNumber);
-                            mainView.getScene().setRoot(root);
-                        } catch (IOException e) {
-                            m_logger.error("Could not load the deploy controller", e);
-                            MainApp.showErrorScreen(e);
-                        }
-                    });
-                } else {
-                    Platform.runLater(() -> {
-                        MainApp.showErrorPopup("Could not connect to the roboRio at " + roboRioAddress + " after 5 seconds");
-                        m_logger.warn("Could not connect to the roboRio at " + roboRioAddress + " after 5 seconds");
-                        nextButton.setDisable(false);
-                        nextButton.setText("Retry Connect");
-                        mainLabel.setText(CONNECTION_STRING);
-                    });
-                }
-            } catch (UnknownHostException e) {
-                m_logger.warn("Could not resolve the roboRio");
-                Platform.runLater(() -> {
-                    Dialogs.create()
-                            .title("Connection Error")
-                            .message("Could not find the roboRio at " + roboRioAddress + ". Are you on the same network as it?")
-                            .showError();
-                    nextButton.setDisable(false);
-                    nextButton.setText("Retry Connect");
-                    mainLabel.setText(CONNECTION_STRING);
-                });
-            } catch (IOException e) {
-                m_logger.warn("Unknown error when attempting to connect to the roboRio", e);
-                Platform.runLater(() -> {
-                    MainApp.showErrorPopup(
-                            "Unknown error when attempting to connect to the roborio: "
-                                    + System.lineSeparator()
-                                    + e);
-                    nextButton.setDisable(false);
-                    nextButton.setText("Retry Connect");
-                    mainLabel.setText(CONNECTION_STRING);
-                });
+            // Test for connection to the roborio. If no connection, show an error
+            // First check mDNS
+            m_logger.debug("Checking for mDNS connection to the roboRio");
+            if (checkReachable(roboRioMDNS)) {
+                m_logger.debug("Found mDNS connection");
+                return;
             }
-        }).start();
 
+            // No mDNS, check USB
+            m_logger.debug("No mDNS connection found, checking for USB Connection to the roboRio");
+            if (checkReachable(ROBO_RIO_USB_IP)) {
+                m_logger.debug("Found USB connection to the roboRio");
+                return;
+            }
+
+            m_logger.debug("No usb connection found, checking for ethernet connection to the roboRio");
+            if (checkReachable(roboRioIP)) {
+                m_logger.debug("Found ethernet connection to the roboRio");
+                return;
+            }
+            Platform.runLater(() -> {
+                MainApp.showErrorPopup("Could not connect to the roboRio at " + roboRioMDNS + " after 5 seconds");
+                m_logger.warn("Could not connect to the roboRio at " + roboRioMDNS + " or " + ROBO_RIO_USB_IP + " or " + roboRioIP);
+                nextButton.setDisable(false);
+                nextButton.setText("Retry Connect");
+                mainLabel.setText(CONNECTION_STRING);
+            });
+        }).start();
+    }
+
+    /**
+     * Checks to see if the given ip address (or host name) is reachable in 5 seconds. If it is, then the next stage is
+     * loaded. If not, then false is returned, and nothing is changed
+     *
+     * @param ip The ip or hostname to check
+     * @return True if we found the roborio, false otherwise
+     */
+    private boolean checkReachable(String ip) {
+        try {
+            InetAddress address = InetAddress.getByName(ip);
+            if (address.isReachable(5000)) {
+                Platform.runLater(() -> {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/deploy.fxml"));
+                    Parent root = null;
+                    try {
+                        m_logger.debug("Connected to the roboRio at " + ip);
+                        root = loader.load();
+                        DeployController controller = loader.getController();
+                        controller.initialize(m_tarLocation, m_untarredLocation, m_jreFolder, teamNumber, ip);
+                        mainView.getScene().setRoot(root);
+                    } catch (IOException e) {
+                        m_logger.error("Could not load the deploy controller", e);
+                        MainApp.showErrorScreen(e);
+                    }
+                });
+                return true;
+            } else {
+                return false;
+            }
+        } catch (IOException e) {
+            m_logger.warn("Could not connect to the roboRio at " + ip, e);
+            return false;
+        }
     }
 }
