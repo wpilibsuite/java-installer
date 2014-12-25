@@ -6,7 +6,7 @@
 <?import javafx.scene.web.WebView?>
 <BorderPane fx:id="mainView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
             prefHeight="500" prefWidth="700" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="edu.wpi.first.wpilib.javainstaller.Controllers.DownloadController">
+            fx:controller="edu.wpi.first.wpilib.javainstaller.controllers.DownloadController">
     <bottom>
         <VBox spacing="0">
             <children>

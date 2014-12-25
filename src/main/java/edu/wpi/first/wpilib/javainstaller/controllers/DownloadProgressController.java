@@ -1,11 +1,9 @@
-package edu.wpi.first.wpilib.javainstaller.Controllers;
+package edu.wpi.first.wpilib.javainstaller.controllers;
 
-import edu.wpi.first.wpilib.javainstaller.MainApp;
+import edu.wpi.first.wpilib.javainstaller.Arguments;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -16,7 +14,7 @@ import java.io.*;
 import java.net.*;
 
 /**
- * Starts the download and shows the user the download and extract process progress
+ * Starts the download and shows the user the download progress
  */
 public class DownloadProgressController extends AbstractController {
     @FXML
@@ -29,26 +27,53 @@ public class DownloadProgressController extends AbstractController {
     @FXML
     private Button nextButton;
 
-    private URL downloadUrl;
-    private Thread downloadThread;
+    private URL m_downloadUrl;
+    private Thread m_downloadThread;
     private final Logger m_logger = LogManager.getLogger();
 
     public DownloadProgressController() {
-        super("/fxml/download.fxml");
+        // Do not add to the back stack. The next series of screens are just progress screens as we download and
+        // create the JRE, so there's nothing the user can do. The next logical back step for the user is to the
+        // browser page
+        super(false, Arguments.Controller.DOWNLOAD_PROGRESS_CONTROLLER);
     }
 
-    public void initialize(URL downloadLocation) {
-        downloadUrl = downloadLocation;
-        downloadThread = new Thread(new Downloader());
-        downloadThread.setDaemon(true);
-        downloadThread.start();
+    @Override
+    protected void initializeClass() {
+        String urlString = m_args.getArgument(Arguments.Argument.JRE_CREATOR_URL);
+        if (urlString == null) {
+            m_logger.error("Received null string for the url! Exiting with error.");
+            showErrorScreen(new IllegalArgumentException("Url String was null!"));
+            return;
+        }
+
+        try {
+            m_downloadUrl = new URL(urlString);
+        } catch (MalformedURLException e) {
+            m_logger.error("Received malformed url " + urlString, e);
+            showErrorScreen(e);
+            return;
+        }
+
+        m_downloadThread = new Thread(new Downloader());
+        m_downloadThread.setDaemon(true);
+        m_downloadThread.start();
     }
 
     @FXML
     @Override
-    public void handleBack(ActionEvent event) {
-        downloadThread.interrupt();
+    protected void handleBack(ActionEvent event) {
+        // We need to override the original handler to ensure that the download thread is interrupted
+        m_downloadThread.interrupt();
         super.handleBack(event);
+    }
+
+    @FXML
+    @Override
+    protected void handleCancel(ActionEvent event) {
+        // Just like in handleBack, we need to interrupt the download thread
+        m_downloadThread.interrupt();
+        super.handleCancel(event);
     }
 
     /**
@@ -66,12 +91,11 @@ public class DownloadProgressController extends AbstractController {
             try {
                 // Get the location of the current directory and the file name
                 File currentDirectory = new File(".");
-                String fileName = downloadUrl.getPath().substring(downloadUrl.getPath().lastIndexOf("/") + 1);
-                File javaFile = new File(currentDirectory.getAbsolutePath() + File.separator + fileName);
+                String fileName = m_downloadUrl.getPath().substring(m_downloadUrl.getPath().lastIndexOf("/") + 1);
+                File jreCreatorFile = new File(currentDirectory.getAbsolutePath() + File.separator + fileName);
 
                 // Set up the streams
-                downloadConnection = (HttpURLConnection) downloadUrl.openConnection();
-                System.out.println("Url is " + downloadUrl);
+                downloadConnection = (HttpURLConnection) m_downloadUrl.openConnection();
                 CookieManager handler = (CookieManager) CookieHandler.getDefault();
                 CookieStore store = handler.getCookieStore();
                 for (HttpCookie cookie : store.getCookies()) {
@@ -89,7 +113,7 @@ public class DownloadProgressController extends AbstractController {
                         status == HttpURLConnection.HTTP_SEE_OTHER) {
                     String redirectUrl = downloadConnection.getHeaderField("Location");
                     String cookies = downloadConnection.getHeaderField("Set-Cookie");
-                    System.out.println("Redirecting to " + redirectUrl);
+                    m_logger.debug("Redirecting to " + redirectUrl);
                     downloadConnection = (HttpURLConnection) new URL(redirectUrl).openConnection();
                     downloadConnection.setRequestProperty("Cookie", cookies);
                     downloadConnection.connect();
@@ -98,8 +122,7 @@ public class DownloadProgressController extends AbstractController {
                 m_logger.debug("Final url is " + downloadConnection.getURL());
 
                 downloadStream = new BufferedInputStream(downloadConnection.getInputStream());
-                outputStream = new BufferedOutputStream(new FileOutputStream(javaFile));
-
+                outputStream = new BufferedOutputStream(new FileOutputStream(jreCreatorFile));
 
                 // Loop until the file is downloaded
                 byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
@@ -109,7 +132,7 @@ public class DownloadProgressController extends AbstractController {
                 int rateDownload = 0;
                 final int fileSize = downloadConnection.getContentLength();
                 long startTime = System.currentTimeMillis();
-                m_logger.debug("Starting JRE download. File size is " + fileSize + " bytes");
+                m_logger.debug("Starting JRE Creator download. File size is " + fileSize + " bytes");
                 while ((sizeOfChunk = downloadStream.read(buffer)) != -1) {
                     outputStream.write(buffer, 0, sizeOfChunk);
                     long endTime = System.currentTimeMillis();
@@ -135,23 +158,10 @@ public class DownloadProgressController extends AbstractController {
                 m_logger.debug("Downloaded JRE");
                 outputStream.flush();
                 outputStream.close();
-
-                // Move to the new window
-                Platform.runLater(() -> {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/downloaded.fxml"));
-                    try {
-                        Parent root = loader.load();
-                        DownloadedController controller = loader.getController();
-                        controller.initialize(javaFile.getAbsolutePath());
-                        mainView.getScene().setRoot(root);
-                    } catch (IOException e) {
-                        m_logger.error("Error when loaded downloaded page", e);
-                        MainApp.showErrorScreen(e);
-                    }
-                });
+                m_args.setArgument(Arguments.Argument.JRE_CREATOR_TAR, jreCreatorFile.getAbsolutePath());
             } catch (IOException e) {
                 m_logger.error("Could not download the JRE", e);
-                Platform.runLater(() -> MainApp.showErrorScreen(e));
+                Platform.runLater(() -> showErrorScreen(e));
             } finally {
                 // Ensure streams are closed
                 if (downloadStream != null) {
@@ -169,6 +179,15 @@ public class DownloadProgressController extends AbstractController {
                         m_logger.warn("Error when closing the output stream", e);
                     }
                 }
+
+                final boolean interrupted = Thread.interrupted();
+
+                // Move to the new window
+                Platform.runLater(() -> {
+                    if (!interrupted) {
+                        moveNext(Arguments.Controller.UNTAR_CONTROLLER);
+                    }
+                });
             }
         }
     }

@@ -1,27 +1,19 @@
-package edu.wpi.first.wpilib.javainstaller.Controllers;
+package edu.wpi.first.wpilib.javainstaller.controllers;
 
 import com.jcraft.jsch.*;
-import edu.wpi.first.wpilib.javainstaller.MainApp;
+import edu.wpi.first.wpilib.javainstaller.Arguments;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
-import org.apache.commons.compress.utils.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * Deploys the JRE to the roboRio
  */
-public class DeployController {
+public class DeployController extends AbstractController {
     private static final String JRE_INSTALL_LOCATION = "/usr/local/frc";
     // File to save compress the jre to
     public static final String JRE_TGZ_NAME = "JRE.tar.gz";
@@ -36,97 +28,40 @@ public class DeployController {
     private static final String USER_NAME = "admin";
 
     @FXML
-    private BorderPane mainView;
-    @FXML
     private Label commandLabel;
 
-    private String m_tarLocation;
-    private String m_untarredLocation;
-    private String m_jreLocation;
     private String m_ipAddress;
+    private String m_jreTarLocation;
     private JSch m_jSch = new JSch();
 
     private final Logger m_logger = LogManager.getLogger();
 
-    @FXML
-    private void handleBack(ActionEvent event) {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/connect_roborio.fxml"));
-        try {
-            Parent root = loader.load();
-            ConnectRoboRioController controller = loader.getController();
-            controller.initialize(m_jreLocation, m_tarLocation, m_untarredLocation);
-            mainView.getScene().setRoot(root);
-        } catch (IOException e) {
-            m_logger.error("Could not load the connect roboRio controller");
-            MainApp.showErrorScreen(e);
-        }
+    public DeployController() {
+        super(false, Arguments.Controller.DEPLOY_CONTROLLER);
     }
 
-    @FXML
-    private void handleCancel(ActionEvent event) {
-        MainApp.showExitPopup();
-    }
-
-    public void initialize(String tarLocation, String untarredLocation, String jreLocation, int teamNumber, String ipAddress) {
-        m_tarLocation = tarLocation;
-        m_untarredLocation = untarredLocation;
-        m_jreLocation = jreLocation;
-        m_ipAddress = ipAddress;
-        Thread sshThread = new Thread(() -> {
-            // Turn the jre into a tar gz for ease of transfer
-            Platform.runLater(() -> commandLabel.setText("Tarring created JRE"));
-            File tgzFile = new File(JRE_TGZ_NAME);
-            createTar(tgzFile);
-
-            JSch.setConfig("StrictHostKeyChecking", "no");
-            try {
-                Session roboRioSession = m_jSch.getSession(USER_NAME, ipAddress);
-                roboRioSession.setPassword("");
-                roboRioSession.connect();
-                scpFile(tgzFile, roboRioSession);
-                setupJRE(roboRioSession);
-
-                Platform.runLater(() -> {
-                    try {
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/success.fxml"));
-                        Parent root = loader.load();
-                        SuccessController controller = loader.getController();
-                        controller.initialize(m_jreLocation, m_tarLocation, m_untarredLocation);
-                        mainView.getScene().setRoot(root);
-                    } catch (IOException e) {
-                        m_logger.error("Could not load the success screen", e);
-                        MainApp.showErrorScreen(e);
-                    }
-                });
-            } catch (JSchException | IOException e) {
-                m_logger.error("Failure to send JRE to the roboRio", e);
-                MainApp.showErrorScreen(e);
-            }
-        });
+    @Override
+    protected void initializeClass() {
+        m_ipAddress = m_args.getArgument(Arguments.Argument.IP);
+        m_jreTarLocation = m_args.getArgument(Arguments.Argument.JRE_TAR);
+        Thread sshThread = new Thread(this::transferJRE);
         sshThread.setDaemon(true);
         sshThread.start();
     }
 
-    /**
-     * Creates the tar file with the created JRE for sending to the roborio
-     *
-     * @param tgzFile The tar file location to use
-     */
-    private void createTar(File tgzFile) {
-        if (tgzFile.exists()) {
-            tgzFile.delete();
-            m_logger.debug("Removed the old tgz file");
-        }
+    private void transferJRE() {
+        JSch.setConfig("StrictHostKeyChecking", "no");
         try {
-            m_logger.debug("Starting zip");
-            tgzFile.createNewFile();
-            TarArchiveOutputStream tgzStream = new TarArchiveOutputStream(new GZIPOutputStream(new BufferedOutputStream(new FileOutputStream(tgzFile))));
-            addFileToTarGz(tgzStream, m_jreLocation, "");
-            tgzStream.finish();
-            tgzStream.close();
-        } catch (IOException e) {
-            m_logger.error("Could not create the tar gz file. Do we have write permissions to the current working directory?", e);
-            MainApp.showErrorScreen(e);
+            Session roboRioSession = m_jSch.getSession(USER_NAME, m_ipAddress);
+            roboRioSession.setPassword("");
+            roboRioSession.connect();
+            scpFile(new File(m_jreTarLocation), roboRioSession);
+            setupJRE(roboRioSession);
+
+            Platform.runLater(() -> moveNext(Arguments.Controller.SUCCESS_CONTROLLER));
+        } catch (JSchException | IOException e) {
+            m_logger.error("Failure to send JRE to the roboRio", e);
+            showErrorScreen(e);
         }
     }
 
@@ -181,7 +116,7 @@ public class DeployController {
     }
 
     /**
-     * Sets up the newly scped JRE on the roboRio. It removes any existing JRE, untars the new JRE, moves it to the correct
+     * Sets up the newly scp'd JRE on the roboRio. It removes any existing JRE, untars the new JRE, moves it to the correct
      * location, sets permissions on the bin folder, and removes the temporary tar file
      *
      * @param roboRioSession The roborio to set up
@@ -222,39 +157,6 @@ public class DeployController {
         Platform.runLater(() -> commandLabel.setText("Cleaning up installer files"));
         executeCommand(roboRioSession, "rm " + JRE_TGZ_LOCATION, "Could not clean up. The roboRio MIGHT be ok to use, but you should submit the error logs anyway");
         m_logger.debug("Cleaned up");
-    }
-
-
-    /**
-     * Recursively adds a directory to a .tar.gz. Adapted from
-     * http://stackoverflow.com/questions/13461393/compress-directory-to-tar-gz-with-commons-compress
-     *
-     * @param tOut The .tar.gz to add the directory to
-     * @param path The location of the folders and files to add
-     * @param base The base path of entry in the .tar.gz
-     * @throws IOException Any exceptions thrown during tar creation
-     */
-    private void addFileToTarGz(TarArchiveOutputStream tOut, String path, String base) throws IOException {
-        File f = new File(path);
-        String entryName = base + f.getName();
-        TarArchiveEntry tarEntry = new TarArchiveEntry(f, entryName);
-        tOut.putArchiveEntry(tarEntry);
-        m_logger.debug("Processing file " + f.getAbsolutePath() + ", putting tar entry is " + entryName);
-
-        if (f.isFile()) {
-            FileInputStream fin = new FileInputStream(f);
-            IOUtils.copy(fin, tOut);
-            fin.close();
-            tOut.closeArchiveEntry();
-        } else {
-            tOut.closeArchiveEntry();
-            File[] children = f.listFiles();
-            if (children != null) {
-                for (File child : children) {
-                    addFileToTarGz(tOut, child.getAbsolutePath(), entryName + "/");
-                }
-            }
-        }
     }
 
     /**

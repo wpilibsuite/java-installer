@@ -1,11 +1,10 @@
-package edu.wpi.first.wpilib.javainstaller.Controllers;
+package edu.wpi.first.wpilib.javainstaller.controllers;
 
+import edu.wpi.first.wpilib.javainstaller.Arguments;
 import edu.wpi.first.wpilib.javainstaller.MainApp;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
@@ -14,7 +13,6 @@ import javafx.scene.web.WebView;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.MalformedURLException;
@@ -70,11 +68,11 @@ public class DownloadController extends AbstractController {
     private final Logger m_logger = LogManager.getLogger();
 
     public DownloadController() {
-        super("/fxml/connect_internet.fxml");
+        super(true, Arguments.Controller.DOWNLOAD_CONTROLLER);
     }
 
-    @FXML
-    private void initialize() {
+    @Override
+    protected void initializeClass() {
         CookieManager manager = new CookieManager();
         CookieHandler.setDefault(manager);
 
@@ -86,16 +84,8 @@ public class DownloadController extends AbstractController {
             if (signedIn && newLoc.endsWith("tar.gz")) {
                 Platform.runLater(() -> {
                     m_logger.debug("Signed in and have the .tar.gz link.");
-                    FXMLLoader loader = new FXMLLoader();
-                    try {
-                        Parent root = loader.load(getClass().getResource("/fxml/download_progress.fxml").openStream());
-                        DownloadProgressController controller = loader.getController();
-                        controller.initialize(new URL(newLoc));
-                        mainView.getScene().setRoot(root);
-                    } catch (IOException e) {
-                        m_logger.error("Could not display the downloadprogress page", e);
-                        MainApp.showErrorScreen(e);
-                    }
+                    m_args.setArgument(Arguments.Argument.JRE_CREATOR_URL, newLoc);
+                    moveNext(Arguments.Controller.DOWNLOAD_PROGRESS_CONTROLLER);
                 });
             }
         });

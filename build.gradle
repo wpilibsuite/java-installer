@@ -1,0 +1,46 @@
+apply from: 'http://dl.bintray.com/content/shemnon/javafx-gradle/8.1.1/javafx.plugin'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
+
+javafx {
+    mainClass 'edu.wpi.first.wpilib.javainstaller.MainApp'
+}
+
+publishing {
+    publications {
+        javaInstaller(MavenPublication) {
+            artifact uberjar
+            groupId 'edu.wpi.first.wpilib'
+            artifactId 'java-installer'
+            version '1.0-SNAPSHOT'
+        }
+    }
+    repositories {
+        maven {
+            url "${System.getProperty("user.home")}/releases/maven"
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+task uberjar(type: Jar) {
+    description 'Builds the fat jar with all dependencies. This is the task to run for releasing a new version of the installer'
+    dependsOn configurations.runtime
+    manifest.attributes('Main-Class': 'edu.wpi.first.wpilib.javainstaller.MainApp')
+    from sourceSets.main.output
+    from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+dependencies {
+    compile 'org.apache.commons:commons-compress:1.9'
+    compile 'com.jcraft:jsch:0.1.51'
+    compile 'org.apache.logging.log4j:log4j-api:2.3'
+    compile 'org.apache.logging.log4j:log4j-core:2.3'
+    runtime 'org.apache.commons:commons-compress:1.9'
+    runtime 'com.jcraft:jsch:0.1.51'
+    runtime 'org.apache.logging.log4j:log4j-api:2.3'
+    runtime 'org.apache.logging.log4j:log4j-core:2.3'
+}

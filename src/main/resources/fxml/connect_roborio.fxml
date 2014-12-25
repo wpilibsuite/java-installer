@@ -6,11 +6,12 @@
 <?import javafx.scene.text.Font?>
 <BorderPane fx:id="mainView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
             prefHeight="500" prefWidth="700" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="edu.wpi.first.wpilib.javainstaller.Controllers.ConnectRoboRioController">
+            fx:controller="edu.wpi.first.wpilib.javainstaller.controllers.ConnectRoboRioController">
     <bottom>
         <HBox alignment="BOTTOM_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="10.0"
               BorderPane.alignment="CENTER">
             <children>
+                <Button fx:id="openDirectory" onAction="#handleOpenDirectory" text="Open in Explorer"/>
                 <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#handleCancel" text="Cancel"/>
                 <Button fx:id="backButton" onAction="#handleBack" text="&lt; Back"/>
                 <Button fx:id="nextButton" mnemonicParsing="false" onAction="#handleNext" text="Connect"/>
@@ -25,7 +26,7 @@
             <children>
                 <Label fx:id="mainLabel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
                        prefWidth="700.0"
-                       text="Please ensure that you are connected to the roboRio on this computer, and input your team number below. Once you have put in your team number, hit connect."
+                       text=""
                        wrapText="true">
                     <font>
                         <Font size="24.0"/>

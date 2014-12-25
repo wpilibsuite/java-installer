@@ -7,7 +7,7 @@
 <?import javafx.scene.text.Font?>
 <BorderPane fx:id="mainView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
             prefHeight="500" prefWidth="700" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="edu.wpi.first.wpilib.javainstaller.Controllers.ErrorController">
+            fx:controller="edu.wpi.first.wpilib.javainstaller.controllers.ErrorController">
     <bottom>
         <HBox alignment="BOTTOM_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="10.0"
               BorderPane.alignment="CENTER">

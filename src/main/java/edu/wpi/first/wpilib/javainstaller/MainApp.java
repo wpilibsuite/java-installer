@@ -1,17 +1,16 @@
 package edu.wpi.first.wpilib.javainstaller;
 
-import edu.wpi.first.wpilib.javainstaller.Controllers.ErrorController;
+import edu.wpi.first.wpilib.javainstaller.controllers.ErrorController;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.Dialog;
-import org.controlsfx.dialog.Dialogs;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,14 +20,13 @@ import java.nio.file.Paths;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
 
 /**
  * Main application launch point.
  */
 public class MainApp extends Application {
 
-    // The md5 hash of a fully downloaded jre
-    private static final String JRE_HASH = "082F08397B0D3F63844AB472B5111C8C";
     private static final Logger logger = LogManager.getLogger();
     private static Scene _scene;
 
@@ -38,8 +36,7 @@ public class MainApp extends Application {
 
     public void start(Stage stage) throws Exception {
         logger.trace("Starting application");
-        FXMLLoader loader = new FXMLLoader();
-        Parent root = loader.load(getClass().getResource("/fxml/intro_screen.fxml"));
+        Parent root = ControllerFactory.getInstance().initializeController(Arguments.Controller.WELCOME_CONTROLLER, new Arguments());
 
         Scene scene = new Scene(root);
         _scene = scene;
@@ -56,16 +53,13 @@ public class MainApp extends Application {
     /**
      * Shows a popup that exits the program on clicking yes.
      */
-    @SuppressWarnings("deprecation")
     public static void showExitPopup() {
-        // TODO: When JDK8u40 is release (estimated March 2015) update this to official APIs
-        Action action = Dialogs.create()
-                .title("Exit")
-                .message("Are you sure you want to quit? The roboRio will not be set up for Java until the installer has completed.")
-                .actions(Dialog.ACTION_YES, Dialog.ACTION_NO)
-                .showConfirm();
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Exit");
+        alert.setContentText("Are you sure you want to quit? The roboRio will not be set up for Java until the installer has completed.");
+        Optional<ButtonType> action = alert.showAndWait();
 
-        if (action == Dialog.ACTION_YES) {
+        if (!action.isPresent() || action.get().equals(ButtonType.OK)) {
             logger.debug("Exiting installer from popup");
             Platform.exit();
         }
@@ -77,10 +71,11 @@ public class MainApp extends Application {
 
     @SuppressWarnings("deprecation")
     public static void showErrorPopup(String error, boolean exit) {
-        Dialogs.create()
-                .title("Error")
-                .message(error)
-                .showError();
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setContentText(error);
+        alert.showAndWait();
+
         if (exit) {
             logger.debug("Exiting application from error popup");
             Platform.exit();
@@ -97,12 +92,12 @@ public class MainApp extends Application {
             _scene.setRoot(root);
         } catch (IOException ex) {
             LogManager.getLogger().error("Unknown error when displaying the logger", ex);
-            Dialogs.create()
-                    .title("Error Displaying Error")
-                    .message("Something is really broken. Please copy the contents of the logs folder in " +
-                            new File(".").getAbsolutePath() +
-                            " to the FIRST discussion board")
-                    .showError();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error Displaying Error");
+            alert.setContentText("Something is really broken. Please copy the contents of the logs folder in " +
+                    new File(".").getAbsolutePath() +
+                    " to the FIRST discussion board");
+            alert.showAndWait();
             Platform.exit();
         }
     }
@@ -113,31 +108,46 @@ public class MainApp extends Application {
      * @param jre The jre to check
      * @return True if it passes the MD5 check
      */
-    public static boolean checkJre(File jre) {
+    public static boolean checkJreCreator(File jre) {
         logger.debug("Found JRE, checking hash");
+        return checkFileHash(jre, Arguments.JRE_CREATOR_HASH);
+    }
+
+    /**
+     * Hashes a given file with the md5 algorithm, and compares it to a given hash.
+     *
+     * @param file    The file to verify
+     * @param md5Hash The hash to check
+     * @return True if the hash verifies, false if it doesn't or if there is an error hashing the file
+     */
+    public static boolean checkFileHash(File file, String md5Hash) {
         try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            try (InputStream is = Files.newInputStream(Paths.get(jre.getAbsolutePath()))) {
-                DigestInputStream ds = new DigestInputStream(is, md);
-                byte[] input = new byte[1024];
-
-                // Read the stream to the end to get the md5
-                while (ds.read(input) != -1) {
-                }
-
-                byte[] hash = md.digest();
-                StringBuilder sb = new StringBuilder();
-                for (byte b : hash) {
-                    sb.append(String.format("%02X", b));
-                }
-                String hashString = sb.toString();
-                logger.debug("Computed hash is " + hashString + ", official hash is " + JRE_HASH);
-                return hashString.equalsIgnoreCase(JRE_HASH);
-            }
+            String hashString = hashFile(file);
+            logger.debug("Computed hash is " + hashString + ", official hash is " + md5Hash);
+            return hashString.equalsIgnoreCase(md5Hash);
         } catch (NoSuchAlgorithmException | IOException e) {
             logger.warn("Could not create md5 hash", e);
             return false;
 
+        }
+    }
+
+    public static String hashFile(File file) throws NoSuchAlgorithmException, IOException {
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        try (InputStream is = Files.newInputStream(Paths.get(file.getAbsolutePath()))) {
+            DigestInputStream ds = new DigestInputStream(is, md);
+            byte[] input = new byte[1024];
+
+            // Read the stream to the end to get the md5
+            while (ds.read(input) != -1) {
+            }
+
+            byte[] hash = md.digest();
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hash) {
+                sb.append(String.format("%02X", b));
+            }
+            return sb.toString();
         }
     }
 }

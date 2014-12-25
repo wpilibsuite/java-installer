@@ -9,7 +9,7 @@
 <?import javafx.scene.text.Font?>
 <BorderPane fx:id="mainView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
             prefHeight="500" prefWidth="700" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="edu.wpi.first.wpilib.javainstaller.Controllers.SuccessController">
+            fx:controller="edu.wpi.first.wpilib.javainstaller.controllers.SuccessController">
     <bottom>
         <HBox alignment="BOTTOM_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="10.0"
               BorderPane.alignment="CENTER">
@@ -41,8 +41,6 @@
                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                     </VBox.margin>
                 </Label>
-                <CheckBox fx:id="cleanupCheckBox" mnemonicParsing="false" selected="true"
-                          text="Clean up local installation files?"/>
             </children>
         </VBox>
     </center>

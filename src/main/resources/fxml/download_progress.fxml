@@ -6,7 +6,7 @@
 <?import javafx.scene.text.Font?>
 <BorderPane fx:id="mainView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
             prefHeight="500" prefWidth="700" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="edu.wpi.first.wpilib.javainstaller.Controllers.DownloadProgressController">
+            fx:controller="edu.wpi.first.wpilib.javainstaller.controllers.DownloadProgressController">
     <bottom>
         <HBox alignment="BOTTOM_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="10.0"
               BorderPane.alignment="CENTER">
@@ -32,6 +32,11 @@
                                 <Font size="18.0"/>
                             </font>
                         </Label>
+                        <Label fx:id="percentLabel" text="Percentage">
+                            <font>
+                                <Font size="14.0"/>
+                            </font>
+                        </Label>
                         <ProgressBar fx:id="progressBar" prefWidth="200.0" progress="0.0"/>
                     </children>
                     <padding>
@@ -40,11 +45,6 @@
                 </HBox>
                 <HBox alignment="CENTER" spacing="10.0">
                     <children>
-                        <Label fx:id="percentLabel" text="Percentage">
-                            <font>
-                                <Font size="14.0"/>
-                            </font>
-                        </Label>
                         <Label fx:id="rateLabel" text="Rate">
                             <font>
                                 <Font size="14.0"/>
