@@ -26,7 +26,7 @@ import java.net.URL;
 public class DownloadController extends AbstractController {
 
     public static final URL JRE_URL;
-    public static final String JRE_URL_STRING = "http://www.oracle.com/technetwork/java/embedded/embedded-se/downloads/javase-embedded-downloads-2209751.html";
+    public static final String JRE_URL_STRING = "http://www.oracle.com/technetwork/java/embedded/embedded-se/downloads/javaseembedded8u6-2406243.html";
     public static final String JRE_LOGIN_STRING = "login.oracle.com/mysso/signon.jsp";
     public static final String JRE_ACCOUNT_CREATE_PAGE = "profile.oracle.com/myprofile/account/create-account.jspx";
 
