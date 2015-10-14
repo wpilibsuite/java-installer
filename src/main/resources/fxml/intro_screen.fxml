@@ -32,7 +32,7 @@
                     </VBox.margin>
                 </ImageView>
                 <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="700.0"
-                       text="Welcome to the 2015 roboRio Java Installer. This will walk you through the steps necessary to download and install Java onto your roboRio."
+                       text="Welcome to the roboRio Java Installer. This will walk you through the steps necessary to download and install Java onto your roboRio."
                        wrapText="true">
                     <font>
                         <Font size="24.0"/>
