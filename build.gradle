@@ -18,7 +18,7 @@ publishing {
     }
     repositories {
         maven {
-            url "${System.getProperty("user.home")}/releases/maven"
+            url "${System.getProperty("user.home")}/releases/maven/${project.hasProperty('repo') ? repo : 'development'}"
         }
     }
 }
