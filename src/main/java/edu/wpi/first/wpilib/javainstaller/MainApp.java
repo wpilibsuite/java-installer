@@ -41,7 +41,7 @@ public class MainApp extends Application {
         Scene scene = new Scene(root);
         _scene = scene;
 
-        stage.setTitle("FRC roboRio Java Installer");
+        stage.setTitle("FRC roboRIO Java Installer");
         stage.setScene(scene);
         scene.getWindow().setOnCloseRequest((windowEvent) -> {
             showExitPopup();
@@ -56,7 +56,7 @@ public class MainApp extends Application {
     public static void showExitPopup() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Exit");
-        alert.setContentText("Are you sure you want to quit? The roboRio will not be set up for Java until the installer has completed.");
+        alert.setContentText("Are you sure you want to quit? The roboRIO will not be set up for Java until the installer has completed.");
         Optional<ButtonType> action = alert.showAndWait();
 
         if (!action.isPresent() || action.get().equals(ButtonType.OK)) {

@@ -109,7 +109,7 @@ public abstract class AbstractController {
         m_logger.debug("Showing exit popup");
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Exit");
-        alert.setContentText("Are you sure you want to quit? The roboRio will not be set up for Java until the installer has completed.");
+        alert.setContentText("Are you sure you want to quit? The roboRIO will not be set up for Java until the installer has completed.");
         alert.setHeaderText(null);
         Optional<ButtonType> action = alert.showAndWait();
 

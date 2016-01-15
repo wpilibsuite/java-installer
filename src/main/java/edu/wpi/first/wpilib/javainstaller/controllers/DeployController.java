@@ -60,7 +60,7 @@ public class DeployController extends AbstractController {
 
             Platform.runLater(() -> moveNext(Arguments.Controller.SUCCESS_CONTROLLER));
         } catch (JSchException | IOException e) {
-            m_logger.error("Failure to send JRE to the roboRio", e);
+            m_logger.error("Failure to send JRE to the roboRIO", e);
             showErrorScreen(e);
         }
     }
@@ -74,7 +74,7 @@ public class DeployController extends AbstractController {
      * @throws IOException   If an IO error occurs
      */
     private void scpFile(File tgzFile, Session roboRioSession) throws JSchException, IOException {
-        Platform.runLater(() -> commandLabel.setText("Copying " + tgzFile.getAbsolutePath() + " to the roboRio"));
+        Platform.runLater(() -> commandLabel.setText("Copying " + tgzFile.getAbsolutePath() + " to the roboRIO"));
 
         // Execute the scp -t /home/admin/JRE.tar.gz command. This opens a channel waiting for the data on the
         // roboRio side. This code is adapted from an official JSch example, found here:
@@ -155,7 +155,7 @@ public class DeployController extends AbstractController {
         // Delete the scp'd tar gz
         m_logger.debug("Cleaning up");
         Platform.runLater(() -> commandLabel.setText("Cleaning up installer files"));
-        executeCommand(roboRioSession, "rm " + JRE_TGZ_LOCATION, "Could not clean up. The roboRio MIGHT be ok to use, but you should submit the error logs anyway");
+        executeCommand(roboRioSession, "rm " + JRE_TGZ_LOCATION, "Could not clean up. The roboRIO MIGHT be ok to use, but you should submit the error logs anyway");
         m_logger.debug("Cleaned up");
     }
 

@@ -5,11 +5,14 @@ import edu.wpi.first.wpilib.javainstaller.MainApp;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,16 +20,55 @@ import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Optional;
+
+import static edu.wpi.first.wpilib.javainstaller.controllers.DownloadController.HelpStep.*;
 
 /**
  * Walks the user through downloading the JRE
  */
 public class DownloadController extends AbstractController {
+    private static final String[] instructionStrings = new String[]{
+            "On this page, first click Accept License Agreement under OTN License Agreement",
+            "Next, download the ARMv7 Linux - VFP, SoftFP ABI, Little Endian JRE. This is the second link in the first download box",
+            "You need an Oracle account to download the JRE. If you already have one, you can sign in, and the download will start. Otherwise, please create an account.",
+            "After you have created an account, you will be brought back to the sign in page. After you sign in, the download will begin.",
+            "Having trouble? Restart."
+    };
+
+    enum HelpStep {
+        ACCEPT,
+        DOWNLOAD,
+        SIGN_UP,
+        SIGN_IN,
+        RESTART;
+
+        private static int modSub(int old, int sub, int mod) {
+            int n = (old - sub) % mod;
+            if (n < 0) {
+                n += mod;
+            }
+            return n;
+        }
+
+        public HelpStep getPrevious() {
+            return this.values()[modSub(this.ordinal(), 1, this.values().length)];
+        }
+
+        public HelpStep getNext() {
+            return this.values()[(this.ordinal() + 1) % this.values().length];
+        }
+
+        public String getInstruction() {
+            return instructionStrings[ordinal()];
+        }
+    }
 
     public static final URL JRE_URL;
     public static final String JRE_URL_STRING = "http://www.oracle.com/technetwork/java/embedded/embedded-se/downloads/javaseembedded8u6-2406243.html";
     public static final String JRE_LOGIN_STRING = "login.oracle.com/mysso/signon.jsp";
     public static final String JRE_ACCOUNT_CREATE_PAGE = "profile.oracle.com/myprofile/account/create-account.jspx";
+    public static final String JRE_HFLT_IDENTIFIER = "hflt";
 
     // Jump through hoops to take care of a possible MalformedURLException when initializing the JRE url
     static {
@@ -43,13 +85,9 @@ public class DownloadController extends AbstractController {
 
     }
 
-    private final String[] instructionStrings = new String[]{
-            "On this page, first click Accept License Agreement under OTN License Agreement",
-            "Next, download the ARMv7 Linux - VFP, SoftFP ABI, Little Endian JRE. This is the second link in the first download box",
-            "You need an Oracle account to download the JRE. If you already have one, you can sign in, and the download will start. Otherwise, please create an account.",
-            "After you have created an account, you will be brought back to the sign in page. After you sign in, the download will begin.",
-            "Having trouble? Restart."
-    };
+    private final String incorrectVersionString = "You appear to be downloading the HardFP JRE, not the SoftFP JRE." +
+    " The HardFP JRE does not run correctly on the roboRIO." +
+    " Please download the SoftFP version, the second download link on the page.";
 
     @FXML
     private Label instructions;
@@ -64,7 +102,7 @@ public class DownloadController extends AbstractController {
 
     private boolean creatingAccount = false;
     private boolean signedIn = false;
-    private int currentInstruction = 0;
+    private HelpStep currentInstruction = ACCEPT;
     private final Logger m_logger = LogManager.getLogger();
 
     public DownloadController() {
@@ -80,13 +118,14 @@ public class DownloadController extends AbstractController {
 
         // Set up the download extension listener
         browserEngine.locationProperty().addListener((value, oldLock, newLoc) -> {
-
+            if (newLoc.contains(JRE_HFLT_IDENTIFIER)) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Incorrect JRE");
+                alert.setContentText(incorrectVersionString);
+                alert.showAndWait().ifPresent(button -> Platform.runLater(this::restartDownload));
+            }
             if (signedIn && newLoc.endsWith("tar.gz")) {
-                Platform.runLater(() -> {
-                    m_logger.debug("Signed in and have the .tar.gz link.");
-                    m_args.setArgument(Arguments.Argument.JRE_CREATOR_URL, newLoc);
-                    moveNext(Arguments.Controller.DOWNLOAD_PROGRESS_CONTROLLER);
-                });
+                moveToNext(newLoc);
             }
         });
 
@@ -96,7 +135,7 @@ public class DownloadController extends AbstractController {
             if (location.equals(JRE_URL_STRING)) {
                 m_logger.debug("Loading download page page");
                 Platform.runLater(() -> {
-                    currentInstruction = 0;
+                    currentInstruction = ACCEPT;
                     setInstructionText();
                 });
             } else if (location.contains(JRE_LOGIN_STRING)) {
@@ -104,7 +143,7 @@ public class DownloadController extends AbstractController {
                 m_logger.debug("Loading login page");
                 Platform.runLater(() -> {
                     if (!creatingAccount) {
-                        currentInstruction = 2;
+                        currentInstruction = SIGN_IN;
                         setInstructionText();
                     }
                 });
@@ -112,13 +151,13 @@ public class DownloadController extends AbstractController {
                 creatingAccount = true;
                 m_logger.debug("Loading account creation page");
                 Platform.runLater(() -> {
-                    currentInstruction = 3;
+                    currentInstruction = SIGN_UP;
                     setInstructionText();
                 });
             } else {
                 m_logger.debug("Loading unknown page");
                 Platform.runLater(() -> {
-                    currentInstruction = 4;
+                    currentInstruction = RESTART;
                     setInstructionText();
                 });
             }
@@ -126,58 +165,69 @@ public class DownloadController extends AbstractController {
         browserEngine.load(JRE_URL_STRING);
     }
 
+    private void moveToNext(String url) {
+        Platform.runLater(() -> {
+            m_logger.debug("Signed in and have the .tar.gz link.");
+            m_args.setArgument(Arguments.Argument.JRE_CREATOR_URL, url);
+            moveNext(Arguments.Controller.DOWNLOAD_PROGRESS_CONTROLLER);
+        });
+    }
+
     @FXML
     private void handleInstructionNext(Event event) {
-        currentInstruction++;
+        currentInstruction = currentInstruction.getNext();
         setInstructionText();
     }
 
     @FXML
     private void handleInstructionBack(Event event) {
-        currentInstruction--;
+        currentInstruction = currentInstruction.getPrevious();
         setInstructionText();
     }
 
     private void setInstructionText() {
-        currentInstruction = currentInstruction % instructionStrings.length;
         switch (currentInstruction) {
-            case 0:
-                instructions.setText(instructionStrings[currentInstruction]);
+            case ACCEPT:
+                instructions.setText(currentInstruction.getInstruction());
                 instructions.setUnderline(false);
                 instructions.setTextFill(Color.BLACK);
                 instructions.setOnMouseClicked(null);
                 break;
-            case 1:
-                instructions.setText(instructionStrings[currentInstruction]);
+            case DOWNLOAD:
+                instructions.setText(currentInstruction.getInstruction());
                 instructions.setUnderline(false);
                 instructions.setTextFill(Color.BLACK);
                 instructions.setOnMouseClicked(null);
                 break;
-            case 2:
-                instructions.setText(instructionStrings[currentInstruction]);
+            case SIGN_UP:
+                instructions.setText(currentInstruction.getInstruction());
                 instructions.setUnderline(false);
                 instructions.setTextFill(Color.BLACK);
                 instructions.setOnMouseClicked(null);
                 break;
-            case 3:
-                instructions.setText(instructionStrings[currentInstruction]);
+            case SIGN_IN:
+                instructions.setText(currentInstruction.getInstruction());
                 instructions.setUnderline(false);
                 instructions.setTextFill(Color.BLACK);
                 instructions.setOnMouseClicked(null);
                 break;
-            case 4:
+            case RESTART:
             default:
-                instructions.setText(instructionStrings[currentInstruction]);
+                instructions.setText(currentInstruction.getInstruction());
                 instructions.setUnderline(true);
                 instructions.setTextFill(Color.BLUE);
                 instructions.setOnMouseClicked((mouseEvent) -> {
-                    m_logger.debug("Restarting login process");
-                    browserEngine.load(JRE_URL_STRING);
-                    signedIn = false;
-                    creatingAccount = false;
+                    restartDownload();
                 });
                 break;
         }
-        instructions.setTooltip(new Tooltip(instructionStrings[currentInstruction]));
+        instructions.setTooltip(new Tooltip(currentInstruction.getInstruction()));
+    }
+
+    private void restartDownload() {
+        m_logger.debug("Restarting login process");
+        browserEngine.load(JRE_URL_STRING);
+        signedIn = false;
+        creatingAccount = false;
     }
 }

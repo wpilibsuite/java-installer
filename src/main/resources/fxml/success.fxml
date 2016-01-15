@@ -32,7 +32,7 @@
                     </VBox.margin>
                 </ImageView>
                 <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="700.0"
-                       text="You have successfully deployed Java to your roboRio. Hit finish to exit, or hit restart to deploy java to another roboRio."
+                       text="You have successfully deployed Java to your roboRIO. Hit finish to exit, or hit restart to deploy java to another roboRIO."
                        wrapText="true">
                     <font>
                         <Font size="24.0"/>

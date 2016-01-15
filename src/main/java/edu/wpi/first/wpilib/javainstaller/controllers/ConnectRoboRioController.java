@@ -24,10 +24,10 @@ public class ConnectRoboRioController extends AbstractController {
     public static final String ROBO_RIO_MDNS_FORMAT_STRING = "roborio-%d-frc.local";
     public static final String ROBO_RIO_USB_IP = "172.22.11.2";
     public static final String ROBO_RIO_IP_FORMAT_STRING = "10.%d.%d.2";
-    private static final String CONNECTION_STRING = "At this time, please connect this computer to the roboRio, and" +
-            " enter your team number below. If this computer cannot connect to the roboRio, please hit the Open in" +
+    private static final String CONNECTION_STRING = "At this time, please connect this computer to the roboRIO, and" +
+            " enter your team number below. If this computer cannot connect to the roboRIO, please hit the Open in" +
             " Explorer button below. Copy the JRE.tar.gz file, the JRE.tar.gz.md5 file, and this installer to a " +
-            "computer with access to the roboRio and run it again. If the installer does not automatically find the " +
+            "computer with access to the roboRIO and run it again. If the installer does not automatically find the " +
             "JRE, please hit the Already Downloaded button and browse to its location.";
 
     @FXML
@@ -94,29 +94,29 @@ public class ConnectRoboRioController extends AbstractController {
         new Thread(() -> {
             // Test for connection to the roboRio. If no connection, show an error
             // First check mDNS
-            m_logger.debug("Checking for mDNS connection to the roboRio");
+            m_logger.debug("Checking for mDNS connection to the roboRIO");
             if (checkReachableAndContinue(roboRioMDNS)) {
                 m_logger.debug("Found mDNS connection");
                 return;
             }
 
             // No mDNS, check USB
-            m_logger.debug("No mDNS connection found, checking for USB Connection to the roboRio");
+            m_logger.debug("No mDNS connection found, checking for USB Connection to the roboRIO");
             Platform.runLater(() -> mainLabel.setText("Could not connect with mDNS, trying USB connect at " + ROBO_RIO_USB_IP));
             if (checkReachableAndContinue(ROBO_RIO_USB_IP)) {
                 m_logger.debug("Found USB connection to the roboRio");
                 return;
             }
 
-            m_logger.debug("No usb connection found, checking for ethernet connection to the roboRio");
+            m_logger.debug("No usb connection found, checking for ethernet connection to the roboRIO");
             Platform.runLater(() -> mainLabel.setText("Could not connect with USB, trying legacy ip connect at " + roboRioIP));
             if (checkReachableAndContinue(roboRioIP)) {
-                m_logger.debug("Found ethernet connection to the roboRio");
+                m_logger.debug("Found ethernet connection to the roboRIO");
                 return;
             }
             Platform.runLater(() -> {
-                showErrorPopup("Could not connect to the roboRio at " + roboRioMDNS + " after 5 seconds", false);
-                m_logger.warn("Could not connect to the roboRio at " + roboRioMDNS + " or " + ROBO_RIO_USB_IP + " or " + roboRioIP);
+                showErrorPopup("Could not connect to the roboRIO at " + roboRioMDNS + " after 5 seconds", false);
+                m_logger.warn("Could not connect to the roboRIO at " + roboRioMDNS + " or " + ROBO_RIO_USB_IP + " or " + roboRioIP);
                 nextButton.setDisable(false);
                 nextButton.setText("Retry Connect");
                 mainLabel.setText(CONNECTION_STRING);
