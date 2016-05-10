@@ -8,7 +8,7 @@ The WPILib Mission is to enable FIRST teams to focus on writing game-specific so
 
 # Building the Java Installer
 
-The Java Installer is built with Gradle. There is nothing to install; simply run the appropriate `gradlew` script for your system. Common tasks are:a
+The Java Installer is built with Gradle. There is nothing to install; simply run the appropriate `gradlew` script for your system. Common tasks are:
 
 - check - This is what is run to verify commits. This will build the program.
 - run - Runs the Java Installer program.
