@@ -1,14 +1,16 @@
 package edu.wpi.first.wpilib.javainstaller.controllers;
 
-import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import net.mightypork.rpack.utils.DesktopApi;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 
 /**
  * Controlling for displaying and error to the user and prompting them to submit their logs

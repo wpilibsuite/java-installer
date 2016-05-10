@@ -1,14 +1,5 @@
 package edu.wpi.first.wpilib.javainstaller.controllers;
 
-import edu.wpi.first.wpilib.javainstaller.Arguments;
-import edu.wpi.first.wpilib.javainstaller.MainApp;
-import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.stage.FileChooser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,6 +9,16 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
+
+import edu.wpi.first.wpilib.javainstaller.Arguments;
+import edu.wpi.first.wpilib.javainstaller.MainApp;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.stage.FileChooser;
 
 /**
  * Handles ensuring that the internet is up and running on the system before proceeding
@@ -95,9 +96,9 @@ public class InternetController extends AbstractController {
     }
 
     /**
-     * Checks to see if either a previous jre or the jre creator have already been downloaded. If they have, it will
-     * configure the view to move onto the appropriate step. If they have not, then it will configure the controller
-     * to move onto the internet check
+     * Checks to see if either a previous jre or the jre creator have already been downloaded. If
+     * they have, it will configure the view to move onto the appropriate step. If they have not,
+     * then it will configure the controller to move onto the internet check
      */
 
     private boolean checkExistingJRE(String jreName, String jreCreatorName) {
@@ -149,8 +150,8 @@ public class InternetController extends AbstractController {
     }
 
     /**
-     * Sets up the view to show that the JRE or JRE creator were found already downloaded, and to move onto the
-     * correct places when the buttons are pressed.
+     * Sets up the view to show that the JRE or JRE creator were found already downloaded, and to
+     * move onto the correct places when the buttons are pressed.
      *
      * @param controller The controller to move onto when the next button is pressed
      */
@@ -165,8 +166,8 @@ public class InternetController extends AbstractController {
     }
 
     /**
-     * Checks the internet connection. If the connection is valid, it moves to the next controller. If not, then it sets
-     * up the button to retry
+     * Checks the internet connection. If the connection is valid, it moves to the next controller.
+     * If not, then it sets up the button to retry
      */
     private void checkInternet() {
         try {

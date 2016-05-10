@@ -1,5 +1,12 @@
 package edu.wpi.first.wpilib.javainstaller.controllers;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Optional;
+
 import edu.wpi.first.wpilib.javainstaller.Arguments;
 import edu.wpi.first.wpilib.javainstaller.ControllerFactory;
 import javafx.application.Platform;
@@ -10,19 +17,14 @@ import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.BorderPane;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Optional;
 
 /**
- * Base controller abstraction that handles all navigation, cancellation button pressing, and the general logic. In
- * order for this controller to work, the fxml view for the concrete implementation must have a borderpane with the
- * name mainView. To handle the cancel button, the view must have a button that uses the {@link #handleCancel(javafx.event.ActionEvent)}
- * method as the onAction event. To handle back, The view must have a button that uses the {@link #handleBack(javafx.event.ActionEvent)}
- * method as the onAction event.
+ * Base controller abstraction that handles all navigation, cancellation button pressing, and the
+ * general logic. In order for this controller to work, the fxml view for the concrete
+ * implementation must have a borderpane with the name mainView. To handle the cancel button, the
+ * view must have a button that uses the {@link #handleCancel(javafx.event.ActionEvent)} method as
+ * the onAction event. To handle back, The view must have a button that uses the {@link
+ * #handleBack(javafx.event.ActionEvent)} method as the onAction event.
  */
 public abstract class AbstractController {
 
@@ -40,8 +42,8 @@ public abstract class AbstractController {
     }
 
     /**
-     * Initializes this class with its list of intents. This takes care of the general setup, and then calls
-     * {@link #initializeClass()} for class setup.
+     * Initializes this class with its list of intents. This takes care of the general setup, and
+     * then calls {@link #initializeClass()} for class setup.
      *
      * @param args The arguments for this class
      */
@@ -63,8 +65,8 @@ public abstract class AbstractController {
     }
 
     /**
-     * Handles the back button being pressed. This uses the location provided by the concrete implementation to find
-     * the correct back class and show it.
+     * Handles the back button being pressed. This uses the location provided by the concrete
+     * implementation to find the correct back class and show it.
      *
      * @param event The button event. Ignored
      */
@@ -75,8 +77,8 @@ public abstract class AbstractController {
     }
 
     /**
-     * Helper method for moving to the next window. This view will be passed the current arguments instance from this
-     * class. This method <b>MUST</b> be called from the main JavaFX thread.
+     * Helper method for moving to the next window. This view will be passed the current arguments
+     * instance from this class. This method <b>MUST</b> be called from the main JavaFX thread.
      */
     protected void moveNext(Arguments.Controller nextController) {
         if (m_addToBackStack) {

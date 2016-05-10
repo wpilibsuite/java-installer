@@ -5,3 +5,6 @@ target/
 logs/
 JRE/
 JRE.tar.gz
+.gradle/
+.idea/
+build/

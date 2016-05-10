@@ -1,5 +1,14 @@
 package edu.wpi.first.wpilib.javainstaller.controllers;
 
+import net.mightypork.rpack.utils.DesktopApi;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
+
 import edu.wpi.first.wpilib.javainstaller.Arguments;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -8,13 +17,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import net.mightypork.rpack.utils.DesktopApi;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
 
 /**
  * Attempts to connect to the roboRio, and displays an error for the user if it cannot
@@ -125,8 +127,8 @@ public class ConnectRoboRioController extends AbstractController {
     }
 
     /**
-     * Checks to see if the given ip address (or host name) is reachable in 5 seconds. If it is, then the next stage is
-     * loaded. If not, then false is returned, and nothing is changed
+     * Checks to see if the given ip address (or host name) is reachable in 5 seconds. If it is,
+     * then the next stage is loaded. If not, then false is returned, and nothing is changed
      *
      * @param addr The ip or hostname to check
      * @return True if we found the roborio, false otherwise

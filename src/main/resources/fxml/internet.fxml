@@ -1,20 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<BorderPane fx:id="mainView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-            prefHeight="500" prefWidth="700" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane fx:id="mainView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+            minWidth="-Infinity"
+            prefHeight="500" prefWidth="700" xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="edu.wpi.first.wpilib.javainstaller.controllers.InternetController">
     <bottom>
         <HBox alignment="BOTTOM_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="10.0"
               BorderPane.alignment="CENTER">
             <children>
-                <Button fx:id="alreadyDownloadedButton" text="Already Downloaded" onAction="#handleDownloaded"/>
-                <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#handleCancel" text="Cancel"/>
+                <Button fx:id="alreadyDownloadedButton" text="Already Downloaded"
+                        onAction="#handleDownloaded"/>
+                <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#handleCancel"
+                        text="Cancel"/>
                 <Button fx:id="backButton" text="&lt; Back" onAction="#handleBack"/>
-                <Button fx:id="nextButton" mnemonicParsing="false" onAction="#handleInternetCheck" text="Next &gt;"/>
+                <Button fx:id="nextButton" mnemonicParsing="false" onAction="#handleInternetCheck"
+                        text="Next &gt;"/>
             </children>
             <padding>
                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
@@ -24,7 +32,8 @@
     <center>
         <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
             <children>
-                <Label fx:id="textView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="700.0"
+                <Label fx:id="textView" maxHeight="1.7976931348623157E308"
+                       maxWidth="1.7976931348623157E308" prefWidth="700.0"
                        text="Checking existing files..."
                        wrapText="true">
                     <font>

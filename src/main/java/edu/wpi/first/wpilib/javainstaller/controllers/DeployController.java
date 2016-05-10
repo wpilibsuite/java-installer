@@ -1,14 +1,25 @@
 package edu.wpi.first.wpilib.javainstaller.controllers;
 
-import com.jcraft.jsch.*;
+import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import edu.wpi.first.wpilib.javainstaller.Arguments;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.io.*;
 
 /**
  * Deploys the JRE to the roboRio
@@ -116,8 +127,9 @@ public class DeployController extends AbstractController {
     }
 
     /**
-     * Sets up the newly scp'd JRE on the roboRio. It removes any existing JRE, untars the new JRE, moves it to the correct
-     * location, sets permissions on the bin folder, and removes the temporary tar file
+     * Sets up the newly scp'd JRE on the roboRio. It removes any existing JRE, untars the new JRE,
+     * moves it to the correct location, sets permissions on the bin folder, and removes the
+     * temporary tar file
      *
      * @param roboRioSession The roborio to set up
      * @throws JSchException If a ssh error occurs
@@ -160,12 +172,13 @@ public class DeployController extends AbstractController {
     }
 
     /**
-     * Convenience method to execute a command on the given remote session, using the given string as part of the error
-     * if it fails to run.
+     * Convenience method to execute a command on the given remote session, using the given string
+     * as part of the error if it fails to run.
      *
      * @param roboRioSession The ssh session of the roboRio
      * @param command        The command to execute
-     * @param errorString    The error string to put in the exception if an error occurs. The return code will be appended to the end
+     * @param errorString    The error string to put in the exception if an error occurs. The return
+     *                       code will be appended to the end
      * @throws JSchException If an ssh error occurs
      * @throws IOException   Thrown if there is an io error, or if the command fails to run
      */

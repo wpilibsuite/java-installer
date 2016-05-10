@@ -5,8 +5,9 @@ import java.util.Map;
 import java.util.Stack;
 
 /**
- * This class is responsible for holding all of the different arguments that the controllers need and allowing them
- * to be passed around. It is also responsible for maintaining the back stack of programs.
+ * This class is responsible for holding all of the different arguments that the controllers need
+ * and allowing them to be passed around. It is also responsible for maintaining the back stack of
+ * programs.
  */
 public class Arguments {
     public static final String JRE_CREATOR_HASH = "082F08397B0D3F63844AB472B5111C8C";
@@ -17,8 +18,8 @@ public class Arguments {
     private final Map<Argument, String> m_arguments = new HashMap<>();
 
     /**
-     * Copies the backstack and arguments from an existing arguments instance.
-     * <b>THIS WILL OVERWRITE ALL INFORMATION IN THIS INSTANCE!</b>
+     * Copies the backstack and arguments from an existing arguments instance. <b>THIS WILL
+     * OVERWRITE ALL INFORMATION IN THIS INSTANCE!</b>
      *
      * @param args The arguments to copy from
      */
@@ -75,8 +76,8 @@ public class Arguments {
     }
 
     /**
-     * This enum represents all of the different controllers in the project. When a new controller is added, you need
-     * to update this enum.
+     * This enum represents all of the different controllers in the project. When a new controller
+     * is added, you need to update this enum.
      */
     public enum Controller {
         CONNECT_ROBORIO_CONTROLLER("connect_roborio"),

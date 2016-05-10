@@ -1,16 +1,17 @@
 package edu.wpi.first.wpilib.javainstaller;
 
-import edu.wpi.first.wpilib.javainstaller.controllers.AbstractController;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
+import edu.wpi.first.wpilib.javainstaller.controllers.AbstractController;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+
 /**
- * Factory for creating new controllers. This handles the creation and initialization of the controllers, and returns the
- * new root to the caller
+ * Factory for creating new controllers. This handles the creation and initialization of the
+ * controllers, and returns the new root to the caller
  */
 public final class ControllerFactory {
 
@@ -18,6 +19,7 @@ public final class ControllerFactory {
 
     /**
      * Gets the static singleton factory instance. You cannot make a new instance of the factory
+     *
      * @return The single factory instance
      */
     public static ControllerFactory getInstance() {
@@ -29,17 +31,18 @@ public final class ControllerFactory {
     /**
      * Private constructor so no one can instanciate it.
      */
-    private ControllerFactory() {}
+    private ControllerFactory() {
+    }
 
     /**
-     * Initializes a new controller based on a given string, and initializes the new controller with the given list
-     * of intents. This does not add the original controller to the backstack.
+     * Initializes a new controller based on a given string, and initializes the new controller with
+     * the given list of intents. This does not add the original controller to the backstack.
      *
      * @param controllerName The controller to initialize
-     * @param args The arguments to give the new controller
+     * @param args           The arguments to give the new controller
      * @return The view controlled by the requested controller
      * @throws java.lang.IllegalArgumentException If the given controller does not exist
-     * @throws java.io.IOException If there is an error loading the given controller
+     * @throws java.io.IOException                If there is an error loading the given controller
      */
     public Parent initializeController(Arguments.Controller controllerName, Arguments args) throws IllegalArgumentException, IOException {
         m_logger.debug("Loading controller " + controllerName);

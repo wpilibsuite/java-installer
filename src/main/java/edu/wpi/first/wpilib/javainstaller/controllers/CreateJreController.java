@@ -1,10 +1,5 @@
 package edu.wpi.first.wpilib.javainstaller.controllers;
 
-import edu.wpi.first.wpilib.javainstaller.Arguments;
-import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,6 +8,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+
+import edu.wpi.first.wpilib.javainstaller.Arguments;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 
 /**
  * Takes the extracted JRE and turns it into a customized JRE for the roboRio

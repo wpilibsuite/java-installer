@@ -1,19 +1,25 @@
 package edu.wpi.first.wpilib.javainstaller.controllers;
 
-import edu.wpi.first.wpilib.javainstaller.Arguments;
-import edu.wpi.first.wpilib.javainstaller.MainApp;
-import javafx.application.Platform;
-import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.zip.GZIPOutputStream;
+
+import edu.wpi.first.wpilib.javainstaller.Arguments;
+import edu.wpi.first.wpilib.javainstaller.MainApp;
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 
 /**
  * This controller creates a tarball from the created JRE and creates an md5 for it.
@@ -86,8 +92,7 @@ public class TarJREController extends AbstractController {
     }
 
     /**
-     * Recursively adds a directory to a .tar.gz. Adapted from
-     * http://stackoverflow.com/questions/13461393/compress-directory-to-tar-gz-with-commons-compress
+     * Recursively adds a directory to a .tar.gz. Adapted from http://stackoverflow.com/questions/13461393/compress-directory-to-tar-gz-with-commons-compress
      *
      * @param tOut The .tar.gz to add the directory to
      * @param path The location of the folders and files to add

@@ -1,18 +1,5 @@
 package edu.wpi.first.wpilib.javainstaller.controllers;
 
-import edu.wpi.first.wpilib.javainstaller.Arguments;
-import edu.wpi.first.wpilib.javainstaller.MainApp;
-import javafx.application.Platform;
-import javafx.event.Event;
-import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
-import javafx.scene.paint.Color;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,9 +7,23 @@ import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Optional;
 
-import static edu.wpi.first.wpilib.javainstaller.controllers.DownloadController.HelpStep.*;
+import edu.wpi.first.wpilib.javainstaller.Arguments;
+import edu.wpi.first.wpilib.javainstaller.MainApp;
+import javafx.application.Platform;
+import javafx.event.Event;
+import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
+import javafx.scene.paint.Color;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
+
+import static edu.wpi.first.wpilib.javainstaller.controllers.DownloadController.HelpStep.ACCEPT;
+import static edu.wpi.first.wpilib.javainstaller.controllers.DownloadController.HelpStep.RESTART;
+import static edu.wpi.first.wpilib.javainstaller.controllers.DownloadController.HelpStep.SIGN_IN;
+import static edu.wpi.first.wpilib.javainstaller.controllers.DownloadController.HelpStep.SIGN_UP;
 
 /**
  * Walks the user through downloading the JRE
@@ -86,8 +87,8 @@ public class DownloadController extends AbstractController {
     }
 
     private final String incorrectVersionString = "You appear to be downloading the HardFP JRE, not the SoftFP JRE." +
-    " The HardFP JRE does not run correctly on the roboRIO." +
-    " Please download the SoftFP version, the second download link on the page.";
+            " The HardFP JRE does not run correctly on the roboRIO." +
+            " Please download the SoftFP version, the second download link on the page.";
 
     @FXML
     private Label instructions;

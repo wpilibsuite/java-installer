@@ -1,14 +1,5 @@
 package edu.wpi.first.wpilib.javainstaller;
 
-import edu.wpi.first.wpilib.javainstaller.controllers.ErrorController;
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,6 +12,16 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
+
+import edu.wpi.first.wpilib.javainstaller.controllers.ErrorController;
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.stage.Stage;
 
 /**
  * Main application launch point.
@@ -118,7 +119,8 @@ public class MainApp extends Application {
      *
      * @param file    The file to verify
      * @param md5Hash The hash to check
-     * @return True if the hash verifies, false if it doesn't or if there is an error hashing the file
+     * @return True if the hash verifies, false if it doesn't or if there is an error hashing the
+     * file
      */
     public static boolean checkFileHash(File file, String md5Hash) {
         try {

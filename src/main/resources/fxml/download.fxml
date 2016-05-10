@@ -1,27 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
-<BorderPane fx:id="mainView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-            prefHeight="500" prefWidth="700" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane fx:id="mainView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+            minWidth="-Infinity"
+            prefHeight="500" prefWidth="700" xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="edu.wpi.first.wpilib.javainstaller.controllers.DownloadController">
     <bottom>
         <VBox spacing="0">
             <children>
-                <HBox alignment="CENTER_LEFT" prefHeight="75.0" spacing="10.0" BorderPane.alignment="CENTER">
+                <HBox alignment="CENTER_LEFT" prefHeight="75.0" spacing="10.0"
+                      BorderPane.alignment="CENTER">
                     <children>
                         <Label fx:id="instructions" text="Label" wrapText="true"/>
                         <HBox alignment="CENTER_RIGHT" spacing="10.0" HBox.hgrow="ALWAYS">
                             <children>
                                 <Separator orientation="VERTICAL"/>
-                                <Label fx:id="instructionsBack" alignment="CENTER_RIGHT" contentDisplay="RIGHT"
-                                       maxWidth="78.0" minWidth="78.0" onMouseClicked="#handleInstructionBack"
-                                       prefWidth="78.0" text="&lt; Prev Step" underline="true" textFill="blue"/>
+                                <Label fx:id="instructionsBack" alignment="CENTER_RIGHT"
+                                       contentDisplay="RIGHT"
+                                       maxWidth="78.0" minWidth="78.0"
+                                       onMouseClicked="#handleInstructionBack"
+                                       prefWidth="78.0" text="&lt; Prev Step" underline="true"
+                                       textFill="blue"/>
                                 <Separator orientation="VERTICAL"/>
-                                <Label fx:id="instructionsNext" alignment="CENTER_RIGHT" maxWidth="80.0" minWidth="80.0"
-                                       onMouseClicked="#handleInstructionNext" prefWidth="80.0" text="Next Step &gt;"
+                                <Label fx:id="instructionsNext" alignment="CENTER_RIGHT"
+                                       maxWidth="80.0" minWidth="80.0"
+                                       onMouseClicked="#handleInstructionNext" prefWidth="80.0"
+                                       text="Next Step &gt;"
                                        underline="true" textFill="blue"/>
                             </children>
                         </HBox>
@@ -33,7 +45,8 @@
                 <HBox alignment="BOTTOM_RIGHT" prefHeight="50.0" prefWidth="700.0" spacing="10.0"
                       BorderPane.alignment="CENTER">
                     <children>
-                        <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#handleCancel" text="Cancel"/>
+                        <Button fx:id="cancelButton" mnemonicParsing="false"
+                                onAction="#handleCancel" text="Cancel"/>
                         <Button fx:id="backButton" onAction="#handleBack" text="&lt; Back"/>
                         <Button disable="true" text="Next &gt;"/>
                     </children>
@@ -45,6 +58,7 @@
         </VBox>
     </bottom>
     <center>
-        <WebView fx:id="browserView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER"/>
+        <WebView fx:id="browserView" prefHeight="200.0" prefWidth="200.0"
+                 BorderPane.alignment="CENTER"/>
     </center>
 </BorderPane>

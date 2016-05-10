@@ -1,21 +1,27 @@
 package edu.wpi.first.wpilib.javainstaller.controllers;
 
-import edu.wpi.first.wpilib.javainstaller.Arguments;
-import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 
+import edu.wpi.first.wpilib.javainstaller.Arguments;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+
 /**
- * Prompts the user to either move the JRE zip to a computer that has access to the roboRio, or tells them to move
- * to connect to the robot
+ * Prompts the user to either move the JRE zip to a computer that has access to the roboRio, or
+ * tells them to move to connect to the robot
  */
 public class UntarController extends AbstractController {
 

@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Workaround for different computer systems not always working with {@code Desktop.getDesktop.open()}. This was taken
- * from http://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform, with some
- * modifications made for simplicity and logging with log4j2
+ * Workaround for different computer systems not always working with {@code
+ * Desktop.getDesktop.open()}. This was taken from http://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform,
+ * with some modifications made for simplicity and logging with log4j2
  */
 public class DesktopApi {
 
