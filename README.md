@@ -1,6 +1,6 @@
-# WPILib Project
+# Java Installer Project
 
-Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WPILibC repositories. These are the core libraries for creating robot programs on the RoboRIO.
+Welcome to the WPILib project. This repository contains the Java Installer project, which downloads the embedded JRE creator, creates the JRE for the roboRIO, and installs it on the roboRIO.
 
 ## WPILib Mission
 
