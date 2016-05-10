@@ -1,5 +1,7 @@
 # WPILib Project
 
+[![Build Status](https://travis-ci.org/wpilibsuite/java-installer.svg?branch=master)](https://travis-ci.org/wpilibsuite/java-installer)
+
 Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WPILibC repositories. These are the core libraries for creating robot programs on the RoboRIO.
 
 ## WPILib Mission
