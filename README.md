@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/wpilibsuite/java-installer.svg?branch=master)](https://travis-ci.org/wpilibsuite/java-installer)
 # Java Installer Project
 
 Welcome to the WPILib project. This repository contains the Java Installer project, which downloads the embedded JRE creator, creates the JRE for the roboRIO, and installs it on the roboRIO.
