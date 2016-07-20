@@ -1,7 +1,22 @@
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath 'net.ltgt.gradle:gradle-errorprone-plugin:0.0.8'
+    }
+}
 apply from: 'http://dl.bintray.com/content/shemnon/javafx-gradle/8.1.1/javafx.plugin'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
+apply plugin: 'net.ltgt.errorprone'
+
+configurations.errorprone {
+    resolutionStrategy.force 'com.google.errorprone:error_prone_core:2.0.9'
+}
 
 javafx {
     mainClass 'edu.wpi.first.wpilib.javainstaller.MainApp'

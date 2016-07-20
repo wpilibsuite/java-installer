@@ -1,13 +1,5 @@
 package edu.wpi.first.wpilib.javainstaller.controllers;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.net.CookieHandler;
-import java.net.CookieManager;
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import edu.wpi.first.wpilib.javainstaller.Arguments;
 import edu.wpi.first.wpilib.javainstaller.MainApp;
 import javafx.application.Platform;
@@ -19,11 +11,15 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import static edu.wpi.first.wpilib.javainstaller.controllers.DownloadController.HelpStep.ACCEPT;
-import static edu.wpi.first.wpilib.javainstaller.controllers.DownloadController.HelpStep.RESTART;
-import static edu.wpi.first.wpilib.javainstaller.controllers.DownloadController.HelpStep.SIGN_IN;
-import static edu.wpi.first.wpilib.javainstaller.controllers.DownloadController.HelpStep.SIGN_UP;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import static edu.wpi.first.wpilib.javainstaller.controllers.DownloadController.HelpStep.*;
 
 /**
  * Walks the user through downloading the JRE
@@ -53,11 +49,11 @@ public class DownloadController extends AbstractController {
         }
 
         public HelpStep getPrevious() {
-            return this.values()[modSub(this.ordinal(), 1, this.values().length)];
+            return values()[modSub(ordinal(), 1, values().length)];
         }
 
         public HelpStep getNext() {
-            return this.values()[(this.ordinal() + 1) % this.values().length];
+            return values()[(ordinal() + 1) % values().length];
         }
 
         public String getInstruction() {
