@@ -1,18 +1,11 @@
-buildscript {
-    repositories {
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
-    dependencies {
-        classpath 'net.ltgt.gradle:gradle-errorprone-plugin:0.0.8'
-    }
+plugins {
+    id 'idea'
+    id 'eclipse'
+    id 'maven-publish'
+    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '1.1'
+    id 'net.ltgt.errorprone' version '0.0.8'
 }
 apply from: 'http://dl.bintray.com/content/shemnon/javafx-gradle/8.1.1/javafx.plugin'
-apply plugin: 'idea'
-apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
-apply plugin: 'net.ltgt.errorprone'
 
 configurations.errorprone {
     resolutionStrategy.force 'com.google.errorprone:error_prone_core:2.0.9'
@@ -22,25 +15,10 @@ javafx {
     mainClass 'edu.wpi.first.wpilib.javainstaller.MainApp'
 }
 
-publishing {
-    publications {
-        javaInstaller(MavenPublication) {
-            artifact uberjar
-            groupId 'edu.wpi.first.wpilib'
-            artifactId 'java-installer'
-            version '1.0-SNAPSHOT'
-        }
-    }
-    repositories {
-        maven {
-            url "${System.getProperty("user.home")}/releases/maven/${project.hasProperty('repo') ? repo : 'development'}"
-        }
-    }
-}
-
 repositories {
     mavenCentral()
 }
+
 task uberjar(type: Jar) {
     description 'Builds the fat jar with all dependencies. This is the task to run for releasing a new version of the installer'
     dependsOn configurations.runtime
@@ -58,6 +36,17 @@ dependencies {
     runtime 'com.jcraft:jsch:0.1.51'
     runtime 'org.apache.logging.log4j:log4j-api:2.3'
     runtime 'org.apache.logging.log4j:log4j-core:2.3'
+}
+
+publishing {
+    publications {
+        javaInstaller(MavenPublication) {
+            artifact uberjar
+            groupId 'edu.wpi.first.wpilib'
+            artifactId 'java-installer'
+            version WPILibVersion.version
+        }
+    }
 }
 
 task wrapper(type: Wrapper) {
