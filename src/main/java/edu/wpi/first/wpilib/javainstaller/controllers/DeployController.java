@@ -163,14 +163,14 @@ public class DeployController extends AbstractController {
         Platform.runLater(() -> commandLabel.setText("Setting permissions"));
         executeCommand(roboRioSession, "chmod +x " + JRE_INSTALL_LOCATION + "/JRE/bin/*", "Error when setting permissions on the executables");
         executeCommand(roboRioSession, "setcap 'cap_sys_nice=pe' " + JRE_INSTALL_LOCATION + "/JRE/bin/java", "Error setting priority capability");
-		executeCommand(roboRioSession, "echo '/usr/local/frc/JRE/lib/arm/jli' > /etc/ld.so.conf.d/java.conf", "Error setting ld.so.conf");
+        executeCommand(roboRioSession, "echo '/usr/local/frc/JRE/lib/arm/jli' > /etc/ld.so.conf.d/java.conf", "Error setting ld.so.conf");
         m_logger.debug("Set permissions");
 
         // Delete the scp'd tar gz
         m_logger.debug("Cleaning up");
         Platform.runLater(() -> commandLabel.setText("Cleaning up installer files"));
         executeCommand(roboRioSession, "rm " + JRE_TGZ_LOCATION, "Could not clean up. The roboRIO MIGHT be ok to use, but you should submit the error logs anyway");
-		executeCommand(roboRioSession, "reboot", "Could not reboot");
+        executeCommand(roboRioSession, "reboot", "Could not reboot");
         m_logger.debug("Cleaned up");
     }
 
