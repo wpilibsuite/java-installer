@@ -163,6 +163,8 @@ public class DeployController extends AbstractController {
         Platform.runLater(() -> commandLabel.setText("Setting permissions"));
         executeCommand(roboRioSession, "chmod +x " + JRE_INSTALL_LOCATION + "/JRE/bin/*", "Error when setting permissions on the executables");
         executeCommand(roboRioSession, "setcap 'cap_sys_nice=pe' " + JRE_INSTALL_LOCATION + "/JRE/bin/java", "Error setting priority capability");
+        executeCommand(roboRioSession, "echo '/usr/local/frc/JRE/lib/arm/jli' > /etc/ld.so.conf.d/java.conf", "Error setting ld.so.conf");
+        executeCommand(roboRioSession, "ldconfig", "Error running ldconfig");
         m_logger.debug("Set permissions");
 
         // Delete the scp'd tar gz
