@@ -29,7 +29,7 @@ public final class ControllerFactory {
     private final Logger m_logger = LogManager.getLogger();
 
     /**
-     * Private constructor so no one can instanciate it.
+     * Private constructor so no one can instantiate it.
      */
     private ControllerFactory() {
     }

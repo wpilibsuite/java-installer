@@ -140,10 +140,20 @@ public class DeployController extends AbstractController {
         try {
             m_logger.debug("Attempting to remove old JRE");
             Platform.runLater(() -> commandLabel.setText("Cleaning up existing Java, if it exists"));
-            executeCommand(roboRioSession, "rm -r " + JRE_INSTALL_LOCATION + "/JRE", "");
+            executeCommand(roboRioSession, "rm -rf " + JRE_INSTALL_LOCATION + "/JRE", "");
             m_logger.debug("Removed old JRE");
         } catch (JSchException | IOException e) {
             m_logger.debug("No JRE folder removed");
+        }
+
+        // Remove the old JRE extract dir, if it exists. If it doesn't, this will fail, and we don't care if this one fails, so just log it
+        try {
+            m_logger.debug("Attempting to remove old JRE extract dir");
+            Platform.runLater(() -> commandLabel.setText("Cleaning up old JRE install files, if it exists"));
+            executeCommand(roboRioSession, "rm -rf "+JRE_EXTRACT_DIR,"");
+            m_logger.debug("Removed old JRE extract dir");
+        } catch (JSchException | IOException e) {
+            m_logger.debug("No JRE extract folder removed");
         }
 
         // Extract the JRE
