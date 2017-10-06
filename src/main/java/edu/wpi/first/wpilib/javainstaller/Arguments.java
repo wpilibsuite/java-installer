@@ -72,7 +72,7 @@ public class Arguments {
      * This enum represents all of the different arguments that can be passed around.
      */
     public enum Argument {
-        JRE_CREATOR_TAR, JRE_CREATOR_FOLDER, JRE_FOLDER, JRE_TAR, JRE_CREATOR_URL, IP
+        JRE_CREATOR_TAR, JRE_CREATOR_FOLDER, JRE_FOLDER, JRE_TAR, JRE_CREATOR_URL, IP, USE_COMPACT_JRE
     }
 
     /**
@@ -89,6 +89,7 @@ public class Arguments {
         ERROR_CONTROLLER("error"),
         INTERNET_CONTROLLER("internet"),
         SUCCESS_CONTROLLER("success"),
+        SELECT_JRE_CONTROLLER("select_jre"),
         UNTAR_CONTROLLER("untar"),
         TAR_JRE_CONTROLLER("tar_jre"),
         WELCOME_CONTROLLER("intro_screen");

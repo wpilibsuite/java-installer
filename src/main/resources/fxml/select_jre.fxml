@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<BorderPane fx:id="mainView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+            minWidth="-Infinity"
+            prefHeight="500" prefWidth="700" xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="edu.wpi.first.wpilib.javainstaller.controllers.SelectJreController">
+    <bottom>
+        <HBox alignment="BOTTOM_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="10.0"
+              BorderPane.alignment="CENTER">
+            <children>
+                <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#handleCancel"
+                        text="Cancel"/>
+                <Button fx:id="backButton" text="&lt; Back" onAction="#handleBack"/>
+                <Button fx:id="fullJreButton" text="Full JRE"
+                        onAction="#handleFullJre"/>
+                <Button fx:id="compactJreButton" onAction="#handleCompactJre"
+                        text="Compact JRE"/>
+            </children>
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+            </padding>
+        </HBox>
+    </bottom>
+    <center>
+        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+            <children>
+                <Label fx:id="textView" maxHeight="1.7976931348623157E308"
+                       maxWidth="1.7976931348623157E308" prefWidth="700.0"
+                       text="Please select which version of the JRE you want to put on your roboRIO. Most teams will want the compact JRE, but if your team uses Java Beans, AWT, or other complex Java features, you'll want the full JRE. If you're not sure, go with the compact."
+                       wrapText="true">
+                    <font>
+                        <Font size="24.0"/>
+                    </font>
+                    <VBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    </VBox.margin>
+                </Label>
+            </children>
+        </VBox>
+    </center>
+</BorderPane>

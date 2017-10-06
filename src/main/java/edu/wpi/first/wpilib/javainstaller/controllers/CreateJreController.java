@@ -20,11 +20,20 @@ import javafx.scene.control.Label;
  */
 public class CreateJreController extends AbstractController {
 
-    private static String[] JRE_CREATE_COMMAND = {"java",
+    private static String[] JRE_COMPACT_CREATE_COMMAND = {"java",
             "-jar",
             "",
             "--dest", "JRE",
             "--profile", "compact2",
+            "--vm", "client",
+            "--keep-debug-info",
+            "--debug"
+    };
+
+    private static String[] JRE_FULL_CREATE_COMMAND = {"java",
+            "-jar",
+            "",
+            "--dest", "JRE",
             "--vm", "client",
             "--keep-debug-info",
             "--debug"
@@ -56,6 +65,7 @@ public class CreateJreController extends AbstractController {
     }
 
     private void createJRE() {
+        String[] JRE_CREATE_COMMAND = m_args.getArgument(Arguments.Argument.USE_COMPACT_JRE).equals("TRUE") ? JRE_COMPACT_CREATE_COMMAND : JRE_FULL_CREATE_COMMAND;
         final String jreCreatorLibLocation = m_jreCreatorFolder + File.separator + "lib" + File.separator + "JRECreate.jar";
         JRE_CREATE_COMMAND[2] = jreCreatorLibLocation;
         m_logger.debug("Staring JRE Creation");
